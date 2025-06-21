@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Rapogi Lwanda SDA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: 'High Tower Text', sans-serif;
+            background: linear-gradient(to right, #2d2d7c, #00695c);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            font-family: 'High Tower Text', sans-serif;
+        }
+
+        h2 {
+
+            margin-bottom: 30px;
+            font-family: 'High Tower Text', sans-serif;
+            color: #ffffff;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #fff;
+            color: #333;
+            font-size: 16px;
+        }
+
+        input[type="submit"] {
+            background-color: #00bfa5;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #1de9b6;
+        }
+
+        .flash-message {
+            color: #ffbaba;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .back-home {
+            display: inline-block;
+            margin-top: 20px;
+            color: #b2dfdb;
+            text-decoration: none;
+        }
+
+        .back-home:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <h2>🔐 Admin Login</h2>
+
+        <form method="POST">
+            <input type="text" name="username" placeholder="Admin Username">
+            <input type="password" name="password" placeholder="Password">
+            <input type="submit" value="Login">
+        </form>
+        
+
+        <a href="{{ url_for('home') }}" class="back-home">🏠 Back to Home</a>
+    </div>
+
+</body>
+
+</html>
