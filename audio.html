@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Library | Church</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<section class="audio-library">
+    <h2>🎵 Rapogi Lwanda Church Albums</h2>
+
+    {% if albums %}
+        {% for album, songs in albums.items() %}
+            <div class="album">
+                <h3>📀 {{ album }}
+
+                    {% if session.get('admin') %}
+                    <form action="{{ url_for('delete_album', album=album.replace(' ', '_')) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn delete-btn"
+                            onclick="return confirm('Are you sure you want to delete the entire album {{ album }}?')">🗑 Delete Album</button>
+                    </form>
+                    {% endif %}
+
+                </h3>
+
+                <ol class="song-list">
+                    {% for song in songs %}
+                    <li>
+                        <div class="song-info">
+                            <span class="song-title">{{ song.replace('_', ' ').replace('.mp3', '') }}</span>
+
+                            <audio controls class="audio-player">
+                                <source src="{{ url_for('static', filename='media/' ~ album.replace(' ', '_') ~ '/' ~ song) }}" type="audio/mpeg">
+                                Your browser does not support the audio tag.
+                            </audio>
+
+                            <a class="btn download-btn" href="{{ url_for('static', filename='media/' ~ album.replace(' ', '_') ~ '/' ~ song) }}" download>⬇️ Download</a>
+
+                            {% if session.get('admin') %}
+                            <form action="{{ url_for('delete_song', album=album.replace(' ', '_'), song=song) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn delete-btn"
+                                    onclick="return confirm('Are you sure you want to delete this song?')">🗑️</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ol>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No albums or songs found.</p>
+    {% endif %}
+</section>
+
+<p style="text-align:center;">
+    <a href="{{ url_for('upload_album') }}" class="btn">➕ Upload New Album</a>
+</p>
+
+<script>
+    const players = document.querySelectorAll('audio');
+    players.forEach(player => {
+        player.addEventListener('play', () => {
+            players.forEach(other => {
+                if (other !== player) {
+                    other.pause();
+                }
+            });
+        });
+    });
+</script>
+
+<div style="text-align: center; margin-top: 20px;">
+    {% if session.get('admin') %}
+        <p>You are logged in as admin</p>
+    {% else %}
+        <a href="{{ url_for('admin_login') }}">🔐 Admin Login</a>
+    {% endif %}
+</div>
+
+
+<a href="{{ url_for('home') }}" class="download-link">🏠 Back to Home</a>
+
+</body>
+</html>

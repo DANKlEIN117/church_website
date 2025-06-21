@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Latest Sermons | Rapogi Lwanda SDA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: 'High Tower Text', serif;
+            background-color: #38155544;
+            padding: 40px 20px;
+            color: #333;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2d2d7c;
+            margin-bottom: 40px;
+        }
+
+        .sermon-list {
+            max-width: 800px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .sermon-item {
+            text-align: left;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .sermon-item strong {
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+
+        .sermon-item em {
+            display: block;
+            margin-top: 5px;
+            color: #555;
+        }
+
+        .sermon-actions {
+            margin-top: 10px;
+        }
+
+        .sermon-actions button {
+            background-color: #ff5252;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .center-buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .center-buttons a {
+            display: inline-block;
+            background-color: #2d2d7c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin: 5px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>🕊 Latest Church Sermons</h2>
+
+    <div class="sermon-list">
+        {% for sermon in sermons %}
+        <div class="sermon-item">
+            <strong>{{ sermon.title }}</strong> ({{ sermon.date }})<br>
+            <em>Preached by {{ sermon.preacher }}</em>
+            <p>{{ sermon.summary }}</p>
+
+            {% if session.get('admin') %}
+            <div class="sermon-actions">
+                <form method="POST" action="{{ url_for('delete_sermon', sermon_id=sermon.id) }}">
+                    <button type="submit">🗑 Delete</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="center-buttons">
+        {% if session.get('admin') %}
+        <a href="{{ url_for('add_sermon') }}">➕ Add Sermon</a>
+        {% endif %}
+        <a href="{{ url_for('home') }}">🏠 Back to Home</a>
+    </div>
+
+</body>
+
+</html>

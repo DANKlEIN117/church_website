@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Songs | Rapogi Lwanda SDA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #004d40, #00695c);
+            color: white;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .upload-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        input[type="file"],
+        input[type="text"] {
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 10px;
+            border: none;
+            width: 100%;
+        }
+
+        input[type="submit"] {
+            padding: 12px 30px;
+            background-color: #00bfa5;
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #1de9b6;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #b2dfdb;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .notice {
+            background-color: rgba(255, 0, 0, 0.1);
+            color: #ffaaaa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="upload-container">
+        <h2>🎶 Upload a New Album to the Church Audio Library</h2>
+
+        {% if session.get('admin') %}
+        <form action="{{ url_for('upload_album') }}" method="post" enctype="multipart/form-data">
+            <input type="text" name="album_name" placeholder="Enter Album Name" required><br>
+            <input type="file" name="songs" accept=".mp3" multiple required><br>
+            <input type="submit" value="Upload Album">
+        </form>
+        <p>You are logged in as admin ✅</p>
+        {% else %}
+        <div class="notice">
+            <p>🔐 Only admins can upload albums.</p>
+            <a href="{{ url_for('admin_login') }}" class="back-link">Login as Admin</a>
+        </div>
+        {% endif %}
+
+        <br>
+        <a href="{{ url_for('audio') }}" class="back-link">🎧 View Audio Library</a>
+    </div>
+
+</body>
+
+</html>

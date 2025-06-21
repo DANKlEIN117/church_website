@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Video Messages</title>
+    <style>
+        body {
+            background-color: #0951af;
+            text-align: center;
+            font-family: 'High Tower Text', sans-serif;
+            padding: 30px;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        video {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            color: #d31299;
+        }
+    
+    .yt-btn {
+        display: inline-block;
+        margin-top: 30px;
+        background: linear-gradient(to right, #ff0000, #cc0000);
+        color: white;
+        padding: 12px 25px;
+        font-size: 16px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        transition: background 0.3s ease;
+    }
+
+    .yt-btn:hover {
+        background: linear-gradient(to right, #cc0000, #990000);
+        text-decoration: underline;
+    }
+</style>
+
+</head>
+
+<body>
+
+    <h2>🎥 Church Video Messages</h2>
+
+    
+
+    <div class="video-grid">
+        {% for video in videos %}
+        <div>
+            <video controls>
+                <source src="{{ url_for('static', filename='videos/' ~ video) }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <p>{{ video }}</p>
+        
+            {% if session.get('admin') %}
+            <form method="POST" action="{{ url_for('delete_video', filename=video) }}">
+                <button type="submit" class="delete-btn">🗑️ Delete</button>
+            </form>
+            {% endif %}
+        </div>
+        
+        {% endfor %}
+    </div>
+
+    {% if session.get('admin') %}
+    <a href="{{ url_for('upload_video') }}" class="upload-btn">📤 Upload New Video</a>
+    {% endif %}
+
+    <a href="https://www.youtube.com/@rapogilwandasdachurchchoir2301" class="yt-btn">
+        📺 Explore More on YouTube
+    </a>
+    
+
+    
+    <a href="{{ url_for('home') }}" class="download-link">🏠 Back to Home</a>
+
+    <script>
+        const players = document.querySelectorAll('video');
+        players.forEach(player => {
+            player.addEventListener('play', () => {
+                players.forEach(other => {
+                    if (other !== player) {
+                        other.pause();
+                    }
+                });
+            });
+        });
+    </script>
+
+
+    {% if session.get('admin') %}
+        <p>You are logged in as admin</p>
+    {% else %}
+        <a href="{{ url_for('admin_login') }}">🔐 Admin Login</a>
+    {% endif %}
+
+
+
+</body>
+
+</html>

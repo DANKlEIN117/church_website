@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Video | Rapogi Lwanda SDA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: 'High Tower Text', sans-serif;
+            background: linear-gradient(to right, #2d2d7c, #00695c);
+            color: #4110b4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .upload-container {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            color: #1c19b1;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background: #fff;
+            color: #333;
+        }
+
+        button {
+            padding: 12px 30px;
+            background-color: #00bfa5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #1de9b6;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #b2dfdb;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="upload-container">
+        <h2>📤 Upload New Video Message</h2>
+
+        
+
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="video" accept="video/mp4" required><br>
+            <button type="submit">Upload Video</button>
+        </form>
+
+        <a href="{{ url_for('video_messages') }}" class="download-link">🏠 Back to  videos</a>
+
+        
+    </div>
+
+    {% if session.get('admin') %}
+        <p>You are logged in as admin</p>
+    {% else %}
+        <a href="{{ url_for('admin_login') }}">🔐 Admin Login</a>
+    {% endif %}
+
+    
+    
+
+</body>
+
+</html>
