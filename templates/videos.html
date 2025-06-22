@@ -1,117 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📺 Church Video Messages</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <title>Video Messages</title>
     <style>
         body {
-            background-color: #0951af;
-            text-align: center;
+            background-color: #091e3e;
+            color: white;
             font-family: 'High Tower Text', sans-serif;
-            padding: 30px;
+            padding: 40px 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: gold;
+            margin-bottom: 40px;
         }
 
         .video-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
+            gap: 30px;
+            padding: 20px;
         }
 
-        video {
-            width: 100%;
-            max-width: 100%;
+        .video-card {
+            background-color: #ffffff11;
+            padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
         }
 
-        h2 {
-            color: #d31299;
+        .video-card video {
+            width: 100%;
+            border-radius: 10px;
         }
-    
-    .yt-btn {
-        display: inline-block;
-        margin-top: 30px;
-        background: linear-gradient(to right, #ff0000, #cc0000);
-        color: white;
-        padding: 12px 25px;
-        font-size: 16px;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: bold;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        transition: background 0.3s ease;
-    }
 
-    .yt-btn:hover {
-        background: linear-gradient(to right, #cc0000, #990000);
-        text-decoration: underline;
-    }
-</style>
+        .video-title {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #f9e79f;
+        }
 
+        .btn {
+            margin-top: 10px;
+            padding: 6px 14px;
+            background-color: gold;
+            color: #333;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #ffd700;
+        }
+
+        .top-buttons {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .top-buttons a {
+            margin: 0 10px;
+        }
+    </style>
 </head>
 
 <body>
 
-    <h2>🎥 Church Video Messages</h2>
+    <h2>🎥 Rapogi Lwanda Church Video Messages</h2>
 
-    
+    <div class="top-buttons">
+        {% if session.get('admin') %}
+            <a href="{{ url_for('upload_video') }}" class="btn">📤 Upload New Video</a>
+        {% endif %}
+        <a href="{{ url_for('home') }}" class="btn">🏠 Back to Home</a>
+        <a href="https://www.youtube.com/results?search_query=sda+sermons" class="btn">📺 Explore on YouTube</a>
+    </div>
 
     <div class="video-grid">
         {% for video in videos %}
-        <div>
+        <div class="video-card">
             <video controls>
-                <source src="{{ url_for('static', filename='videos/' ~ video) }}" type="video/mp4">
+                <source src="{{ video.url }}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
-            <p>{{ video }}</p>
-        
+            <p class="video-title">{{ video.title }}</p>
+
             {% if session.get('admin') %}
-            <form method="POST" action="{{ url_for('delete_video', filename=video) }}">
-                <button type="submit" class="delete-btn">🗑️ Delete</button>
+            <form method="POST" action="{{ url_for('delete_video', filename=video.url.split('/')[-1]) }}">
+                <button type="submit" class="btn">🗑️ Delete</button>
             </form>
             {% endif %}
         </div>
-        
         {% endfor %}
     </div>
-
-    {% if session.get('admin') %}
-    <a href="{{ url_for('upload_video') }}" class="upload-btn">📤 Upload New Video</a>
-    {% endif %}
-
-    <a href="https://www.youtube.com/@rapogilwandasdachurchchoir2301" class="yt-btn">
-        📺 Explore More on YouTube
-    </a>
-    
-
-    
-    <a href="{{ url_for('home') }}" class="download-link">🏠 Back to Home</a>
-
-    <script>
-        const players = document.querySelectorAll('video');
-        players.forEach(player => {
-            player.addEventListener('play', () => {
-                players.forEach(other => {
-                    if (other !== player) {
-                        other.pause();
-                    }
-                });
-            });
-        });
-    </script>
-
-
-    {% if session.get('admin') %}
-        <p>You are logged in as admin</p>
-    {% else %}
-        <a href="{{ url_for('admin_login') }}">🔐 Admin Login</a>
-    {% endif %}
-
-
 
 </body>
 
