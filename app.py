@@ -251,18 +251,20 @@ def upload_video():
     if request.method == 'POST':
         file = request.files['video']
         if file and file.filename.endswith('.mp4'):
-            result = cloudinary.uploader.upload_large(
-                file,
-                resource_type="video",
-                folder="church_videos"
-            )
-            video_url = result['secure_url']
-
-            # Save video_url to list/json/db
-            flash('Video uploaded successfully!')
-            return redirect(url_for('video_messages'))
+            try:
+                result = cloudinary.uploader.upload(
+                    file,
+                    resource_type="video",
+                    folder="church_videos"
+                )
+                flash('Video uploaded successfully!')
+                return redirect(url_for('video_messages'))
+            except Exception as e:
+                flash(f'Upload error: {e}')
+                return redirect(request.url)
 
     return render_template('upload_video.html')
+
 
 
 @app.route('/delete_video/<filename>', methods=['POST'])
@@ -288,9 +290,23 @@ def delete_video(filename):
 
 @app.route('/video_messages')
 def video_messages():
-    video_folder = os.path.join('static', 'videos')
-    videos = [v for v in os.listdir(video_folder) if v.endswith('.mp4')]
-    return render_template('videos.html', videos=videos)
+    videos = []
+
+    try:
+        response = cloudinary.Search()\
+            .expression("folder:church_videos AND resource_type:video")\
+            .sort_by("public_id", "desc")\
+            .max_results(100)\
+            .execute()
+
+        for item in response.get("resources", []):
+            title = item["public_id"].split("/")[-1].replace('_', ' ').title()
+            url = item["secure_url"]
+            videos.append({"title": title, "url": url})
+    except Exception as e:
+        flash(f"Error loading videos: {e}")
+
+    return render_template("videos.html", videos=videos)
 
 @app.route('/events')
 def events():
