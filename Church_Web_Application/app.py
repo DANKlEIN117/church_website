@@ -4,6 +4,15 @@ from werkzeug.utils import secure_filename
 from flask import send_from_directory
 from urllib.parse import quote
 import json
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config(
+    cloud_name="ds0zvwpph",
+    api_key="253451278637439",
+    api_secret="m__whU-CTItr9ZkrjQm1lFAjZPE"
+)
+
 
 app = Flask(__name__)
 app.secret_key = '12508'
@@ -46,28 +55,37 @@ def audio():
 
 @app.route('/upload_album', methods=['GET', 'POST'])
 def upload_album():
+    if not session.get('admin'):
+        flash('Admin access required to upload albums.')
+        return redirect(url_for('admin_login'))
+
     if request.method == 'POST':
         album_name = request.form['album_name'].strip().replace(' ', '_')
         files = request.files.getlist('songs')
+        uploaded_urls = []
 
         if not album_name:
             flash('Album name is required!')
             return redirect(request.url)
 
-        album_folder = os.path.join(app.config['UPLOAD_FOLDER'], album_name)
-        os.makedirs(album_folder, exist_ok=True)
-
-        uploaded = 0
         for file in files:
             if file and allowed_file(file.filename.lower()):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(album_folder, filename))
-                uploaded += 1
+                result = cloudinary.uploader.upload_large(
+                    file,
+                    resource_type="video",  # Accepts audio too
+                    folder=f"church_albums/{album_name}"
+                )
+                uploaded_urls.append(result['secure_url'])
 
-        flash(f"{uploaded} song(s) uploaded to album '{album_name.replace('_', ' ')}'!")
+        flash(f"{len(uploaded_urls)} song(s) uploaded to album '{album_name.replace('_', ' ')}'!")
+
+        # Save these URLs to JSON/db for display
+        # For demo: you can pass them to a global dict or save in a file
+
         return redirect(url_for('audio'))
 
     return render_template('upload.html')
+
 
 
 
@@ -218,12 +236,19 @@ def upload_video():
     if request.method == 'POST':
         file = request.files['video']
         if file and file.filename.endswith('.mp4'):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join('static', 'videos', filename))
+            result = cloudinary.uploader.upload_large(
+                file,
+                resource_type="video",
+                folder="church_videos"
+            )
+            video_url = result['secure_url']
+
+            # Save video_url to list/json/db
             flash('Video uploaded successfully!')
             return redirect(url_for('video_messages'))
 
     return render_template('upload_video.html')
+
 
 @app.route('/delete_video/<filename>', methods=['POST'])
 def delete_video(filename):
