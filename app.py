@@ -52,7 +52,6 @@ def audio():
             albums[album_name.replace('_', ' ')] = songs
     return render_template('audio.html', albums=albums)
 
-
 @app.route('/upload_album', methods=['GET', 'POST'])
 def upload_album():
     if not session.get('admin'):
@@ -62,32 +61,23 @@ def upload_album():
     if request.method == 'POST':
         album_name = request.form['album_name'].strip().replace(' ', '_')
         files = request.files.getlist('songs')
-        uploaded_urls = []
-
-        if not album_name:
-            flash('Album name is required!')
-            return redirect(request.url)
+        uploaded = 0
 
         for file in files:
             if file and allowed_file(file.filename.lower()):
-                result = cloudinary.uploader.upload_large(
+                # Fix: Read the file's stream and upload using 'upload' not 'upload_large'
+                result = cloudinary.uploader.upload(
                     file,
-                    resource_type="video",  # Accepts audio too
-                    folder=f"church_albums/{album_name}"
+                    resource_type='video',
+                    folder=f"church_albums/{album_name}",
+                    public_id=file.filename.rsplit('.', 1)[0]
                 )
-                uploaded_urls.append(result['secure_url'])
+                uploaded += 1
 
-        flash(f"{len(uploaded_urls)} song(s) uploaded to album '{album_name.replace('_', ' ')}'!")
-
-        # Save these URLs to JSON/db for display
-        # For demo: you can pass them to a global dict or save in a file
-
+        flash(f"{uploaded} song(s) uploaded to album '{album_name.replace('_', ' ')}'!")
         return redirect(url_for('audio'))
 
     return render_template('upload.html')
-
-
-
 
 @app.route('/delete/<album>/<song>', methods=['POST'])
 def delete_song(album, song):
