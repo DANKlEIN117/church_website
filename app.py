@@ -112,21 +112,23 @@ def delete_song(album, song):
         return redirect(url_for('admin_login'))
 
     try:
-        path = os.path.join(app.config['UPLOAD_FOLDER'], album, song)
-        if os.path.exists(path):
-            os.remove(path)
+        # Get Cloudinary public_id
+        public_id = f"church_albums/{album}/{song.rsplit('.', 1)[0]}"  # remove .mp3 extension
+        result = cloudinary.uploader.destroy(public_id, resource_type="video")  # 'video' works for audio too
+
+        if result.get("result") == "ok":
             flash(f"Deleted: {song}")
+        else:
+            flash(f"Failed to delete {song}: {result.get('result')}")
         
-        # ✅ Auto-delete empty folder
-        album_folder = os.path.join(app.config['UPLOAD_FOLDER'], album)
-        if os.path.isdir(album_folder) and not os.listdir(album_folder):
-            os.rmdir(album_folder)
-            flash(f"Album '{album}' was empty and removed.")
+        # 🚫 Note: Cloudinary folders are virtual; we can't remove empty folders directly
+        # Optionally, we can check if album still has songs via the API
 
     except Exception as e:
         flash(f"Error deleting file: {e}")
 
     return redirect(url_for('audio'))
+
 
 
 
@@ -270,22 +272,20 @@ def upload_video():
 @app.route('/delete_video/<filename>', methods=['POST'])
 def delete_video(filename):
     if not session.get('admin'):
-        # Store pending action
         session['next_delete_video'] = filename
         flash('Admin access required to delete video.')
         return redirect(url_for('admin_login'))
 
     try:
-        path = os.path.join('static', 'videos', filename)
-        if os.path.exists(path):
-            os.remove(path)
-            flash(f"{filename} deleted.")
-        else:
-            flash("Video file not found.")
+        # Reconstruct the Cloudinary public_id
+        public_id = f"church_videos/{filename.rsplit('.', 1)[0]}"  # remove .mp4
+        cloudinary.uploader.destroy(public_id, resource_type="video")
+        flash(f"Deleted: {filename}")
     except Exception as e:
         flash(f"Error deleting video: {e}")
 
     return redirect(url_for('video_messages'))
+
 
 
 @app.route('/video_messages')
