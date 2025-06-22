@@ -8,47 +8,43 @@
 </head>
 <body>
 
+<nav class="navbar">
+    <ul class="nav-menu">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#sermons">Sermons</a></li>
+        <li><a href="#events">Events</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+</nav>
+
 <section class="audio-library">
     <h2>🎵 Rapogi Lwanda Church Albums</h2>
 
     {% if albums %}
         {% for album, songs in albums.items() %}
-            <div class="album">
-                <h3>📀 {{ album }}
+        <div class="album">
+            <h3>📀 {{ album }}</h3>
 
-                    {% if session.get('admin') %}
-                    <form action="{{ url_for('delete_album', album=album.replace(' ', '_')) }}" method="post" style="display:inline;">
-                        <button type="submit" class="btn delete-btn"
-                            onclick="return confirm('Are you sure you want to delete the entire album {{ album }}?')">🗑 Delete Album</button>
-                    </form>
-                    {% endif %}
+            <ol class="song-list">
+                {% for song in songs %}
+                <li>
+                    <div class="song-info">
+                        <span class="song-title">{{ song.title }}</span>
 
-                </h3>
+                        <audio controls class="audio-player">
+                            <source src="{{ song.url }}" type="audio/mpeg">
+                            Your browser does not support the audio tag.
+                        </audio>
 
-                <ol class="song-list">
-                    {% for song in songs %}
-                    <li>
-                        <div class="song-info">
-                            <span class="song-title">{{ song.replace('_', ' ').replace('.mp3', '') }}</span>
+                        <a href="{{ song.url }}" class="btn download-btn" download>⬇️ Download</a>
 
-                            <audio controls class="audio-player">
-                                <source src="{{ url_for('static', filename='media/' ~ album.replace(' ', '_') ~ '/' ~ song) }}" type="audio/mpeg">
-                                Your browser does not support the audio tag.
-                            </audio>
-
-                            <a class="btn download-btn" href="{{ url_for('static', filename='media/' ~ album.replace(' ', '_') ~ '/' ~ song) }}" download>⬇️ Download</a>
-
-                            {% if session.get('admin') %}
-                            <form action="{{ url_for('delete_song', album=album.replace(' ', '_'), song=song) }}" method="post" style="display:inline;">
-                                <button type="submit" class="btn delete-btn"
-                                    onclick="return confirm('Are you sure you want to delete this song?')">🗑️</button>
-                            </form>
-                            {% endif %}
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ol>
-            </div>
+                        <!-- No delete button since Cloudinary file management is external -->
+                    </div>
+                </li>
+                {% endfor %}
+            </ol>
+        </div>
         {% endfor %}
     {% else %}
         <p>No albums or songs found.</p>
@@ -72,16 +68,13 @@
     });
 </script>
 
-<div style="text-align: center; margin-top: 20px;">
+<div style="text-align: center;">
     {% if session.get('admin') %}
         <p>You are logged in as admin</p>
     {% else %}
         <a href="{{ url_for('admin_login') }}">🔐 Admin Login</a>
     {% endif %}
 </div>
-
-
-<a href="{{ url_for('home') }}" class="download-link">🏠 Back to Home</a>
 
 </body>
 </html>
