@@ -126,12 +126,12 @@
 
   {% if session.get('admin') %}
     <div class="upload-link">
-      <a href="{{ url_for('upload_album') }}">➕ Upload New Album</a>
+      <p><a href="{{ url_for('upload_album') }}">➕ Upload New Album</a></p>
     </div>
   {% endif %}
 
   <div class="upload-link" style="margin-top: 20px;">
-    <a href="{{ url_for('home') }}">🏠 Back to Home</a>
+    <p><a href="{{ url_for('home') }}">🏠 Back to Home</a></p>
   </div>
 
 </body>
