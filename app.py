@@ -45,12 +45,37 @@ def home():
 @app.route('/audio')
 def audio():
     albums = {}
-    for album_name in os.listdir(app.config['UPLOAD_FOLDER']):
-        album_path = os.path.join(app.config['UPLOAD_FOLDER'], album_name)
-        if os.path.isdir(album_path):
-            songs = [f for f in os.listdir(album_path) if f.endswith('.mp3')]
-            albums[album_name.replace('_', ' ')] = songs
-    return render_template('audio.html', albums=albums)
+
+    # Search Cloudinary for all audio files inside church_albums/*
+    results = cloudinary.Search()\
+        .expression("folder:church_albums/* AND resource_type:video")\
+        .sort_by("public_id", "asc")\
+        .max_results(100)\
+        .execute()
+
+    for item in results.get("resources", []):
+        full_path = item["public_id"]  # e.g. church_albums/Yesu_Yuaja/hosanna
+        url = item["secure_url"]
+
+        # Split to get album and song name
+        parts = full_path.split('/')
+        if len(parts) < 3:
+            continue
+
+        album_slug = parts[1]
+        album_name = album_slug.replace('_', ' ')
+        song_title = parts[2].replace('_', ' ').title()
+
+        if album_name not in albums:
+            albums[album_name] = []
+
+        albums[album_name].append({
+            "title": song_title,
+            "url": url
+        })
+
+    return render_template("audio.html", albums=albums)
+
 
 @app.route('/upload_album', methods=['GET', 'POST'])
 def upload_album():
