@@ -126,7 +126,7 @@
 
   {% if session.get('admin') %}
     <div class="upload-link">
-      <p><a href="{{ url_for('upload_album') }}">➕ Upload New Album</a></p><br><br>
+      <p><a href="{{ url_for('audio.upload_album') }}">➕ Upload New Album</a></p><br><br>
     </div>
   {% endif %}
 

@@ -134,7 +134,7 @@
             <div class="caption">{{ captions.get(image, '') }}</div>
 
             {% if session.get('admin') %}
-            <form method="POST" action="{{ url_for('delete_photo', filename=image) }}">
+            <form method="POST" action="{{ url_for('gallery.delete_photo', filename=image) }}">
                 <button type="submit" class="delete-btn">🗑 Delete</button>
             </form>
             {% endif %}
@@ -149,14 +149,14 @@
     </div>
 
     <div class="gallery-actions">
-        <a href="{{ url_for('upload_photo') }}" class="btn">📤 Upload Photo</a>
+        <a href="{{ url_for('gallery.upload_photo') }}" class="btn">📤 Upload Photo</a>
         <a href="{{ url_for('home') }}" class="btn">🏠 Back to Home</a>
     </div>
 
     {% if session.get('admin') %}
         <p>You are logged in as admin</p>
     {% else %}
-        <a href="{{ url_for('admin_login') }}">🔐 Admin Login</a>
+        <a href="{{ url_for('admin.admin_login') }}">🔐 Admin Login</a>
     {% endif %}
 
 

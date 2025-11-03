@@ -77,26 +77,21 @@
     <div class="upload-container">
         <h2>📤 Upload New Video Message</h2>
 
-        
-
-        <form method="POST" enctype="multipart/form-data">
+        <!-- FIXED: added proper action with blueprint -->
+        <form action="{{ url_for('video.upload_video') }}" method="POST" enctype="multipart/form-data">
             <input type="file" name="video" accept="video/mp4" required><br>
             <button type="submit">Upload Video</button>
         </form>
 
-        <a href="{{ url_for('video_messages') }}" class="download-link">🏠 Back to  videos</a>
-
-        
+        <!-- FIXED: correct blueprint reference -->
+        <a href="{{ url_for('video.video_messages') }}" class="back-link">🏠 Back to videos</a>
     </div>
 
     {% if session.get('admin') %}
         <p>You are logged in as admin</p>
     {% else %}
-        <a href="{{ url_for('admin_login') }}">🔐 Admin Login</a>
+        <a href="{{ url_for('admin.admin_login') }}">🔐 Admin Login</a>
     {% endif %}
-
-    
-    
 
 </body>
 

@@ -31,6 +31,14 @@
             margin-bottom: 20px;
         }
 
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 20px;
+        }
+
         input[type="submit"] {
             background-color: #00e676;
             border: none;
@@ -49,6 +57,11 @@
             margin-top: 20px;
             display: inline-block;
             color: #b2dfdb;
+            text-decoration: none;
+        }
+
+        a.back-link:hover {
+            color: #80cbc4;
         }
     </style>
 </head>
@@ -56,21 +69,22 @@
 
     <div class="upload-box">
         <h2>📤 Upload New Church Photo</h2>
-        <form action="{{ url_for('upload_photo') }}" method="post" enctype="multipart/form-data">
+
+        <!-- FIXED url_for calls -->
+        <form action="{{ url_for('gallery.upload_photo') }}" method="post" enctype="multipart/form-data">
             <input type="file" name="photo" accept=".jpg,.jpeg,.png" required><br>
             <input type="text" name="caption" placeholder="Enter caption for this photo"><br><br>
             <input type="submit" value="Upload Photo">
         </form>
 
-        <a href="{{ url_for('gallery') }}" class="back-link">← Back to Gallery</a>
+        <a href="{{ url_for('gallery.gallery') }}" class="back-link">← Back to Gallery</a>
     </div>
 
     {% if session.get('admin') %}
         <p>You are logged in as admin</p>
     {% else %}
-        <a href="{{ url_for('admin_login') }}">🔐 Admin Login</a>
+        <a href="{{ url_for('admin.admin_login') }}">🔐 Admin Login</a>
     {% endif %}
-
 
 </body>
 </html>

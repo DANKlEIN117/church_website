@@ -60,7 +60,7 @@
     {% if session.get('admin') %}
         <p>You are logged in as admin</p>
     {% else %}
-        <a href="{{ url_for('admin_login') }}">🔐 Admin Login</a>
+        <a href="{{ url_for('admin.admin_login') }}">🔐 Admin Login</a>
     {% endif %}
 
 

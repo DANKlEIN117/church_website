@@ -82,25 +82,25 @@
 
     <div class="sermon-list">
         {% for sermon in sermons %}
-        <div class="sermon-item">
-            <strong>{{ sermon.title }}</strong> ({{ sermon.date }})<br>
-            <em>Preached by {{ sermon.preacher }}</em>
-            <p>{{ sermon.summary }}</p>
+        <div class="sermon-card">
+        <h3>{{ sermon.title }}</h3>
+        <p><b>Preacher:</b> {{ sermon.preacher }}</p>
+        <p><b>Date:</b> {{ sermon.date }}</p>
+        <p>{{ sermon.message }}</p>
 
-            {% if session.get('admin') %}
-            <div class="sermon-actions">
-                <form method="POST" action="{{ url_for('delete_sermon', sermon_id=sermon.id) }}">
-                    <button type="submit">🗑 Delete</button>
-                </form>
-            </div>
-            {% endif %}
+        {% if session.get('admin') %}
+        <form method="POST" action="{{ url_for('sermons.delete_sermon', sermon_index=loop.index0) }}">
+            <button type="submit" class="btn">🗑️ Delete</button>
+        </form>
+        {% endif %}
         </div>
         {% endfor %}
+
     </div>
 
     <div class="center-buttons">
         {% if session.get('admin') %}
-        <a href="{{ url_for('add_sermon') }}">➕ Add Sermon</a>
+        <a href="{{ url_for('sermons.add_sermon') }}">➕ Add Sermon</a>
         {% endif %}
         <a href="{{ url_for('home') }}">🏠 Back to Home</a>
     </div>

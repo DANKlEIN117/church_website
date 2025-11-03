@@ -79,8 +79,10 @@
 
     <div class="top-buttons">
         {% if session.get('admin') %}
-            <a href="{{ url_for('upload_video') }}" class="btn">📤 Upload New Video</a>
+            <!-- FIXED: prefixed with blueprint name -->
+            <a href="{{ url_for('video.upload_video') }}" class="btn">📤 Upload New Video</a>
         {% endif %}
+        <!-- FIXED: home route is defined in main app -->
         <a href="{{ url_for('home') }}" class="btn">🏠 Back to Home</a>
         <a href="https://www.youtube.com/@rapogilwandasdachurchchoir2301" class="btn">📺 Explore on YouTube</a>
     </div>
@@ -95,7 +97,8 @@
             <p class="video-title">{{ video.title }}</p>
 
             {% if session.get('admin') %}
-            <form method="POST" action="{{ url_for('delete_video', filename=video.url.split('/')[-1]) }}">
+            <!-- FIXED: prefixed delete route -->
+            <form method="POST" action="{{ url_for('video.delete_video', filename=video.url.split('/')[-1]) }}">
                 <button type="submit" class="btn">🗑️ Delete</button>
             </form>
             {% endif %}

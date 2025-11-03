@@ -81,21 +81,25 @@
         <h2>🎶 Upload a New Album to the Church Audio Library</h2>
 
         {% if session.get('admin') %}
-        <form action="{{ url_for('upload_album') }}" method="post" enctype="multipart/form-data">
+        <!-- FIXED: added proper blueprint name -->
+        <form action="{{ url_for('audio.upload_album') }}" method="post" enctype="multipart/form-data">
             <input type="text" name="album_name" placeholder="Enter Album Name" required><br>
             <input type="file" name="songs" accept=".mp3" multiple required><br>
             <input type="submit" value="Upload Album">
         </form>
         <p>You are logged in as admin ✅</p>
+
         {% else %}
         <div class="notice">
             <p>🔐 Only admins can upload albums.</p>
-            <a href="{{ url_for('admin_login') }}" class="back-link">Login as Admin</a>
+            <!-- FIXED: prefixed admin blueprint -->
+            <a href="{{ url_for('admin.admin_login') }}" class="back-link">Login as Admin</a>
         </div>
         {% endif %}
 
         <br>
-        <a href="{{ url_for('audio') }}" class="back-link">🎧 View Audio Library</a>
+        <!-- FIXED: prefixed audio blueprint -->
+        <a href="{{ url_for('audio.audio') }}" class="back-link">🎧 View Audio Library</a>
     </div>
 
 </body>

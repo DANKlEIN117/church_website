@@ -114,7 +114,7 @@
 
                 {% if session.get('admin') %}
                 <div class="event-actions">
-                    <form method="POST" action="{{ url_for('delete_event', event_id=event.id) }}">
+                    <form method="POST" action="{{ url_for('events.delete_event', event_id=event.id) }}">
                         <button type="submit">🗑 Delete</button>
                     </form>
                 </div>
@@ -125,11 +125,11 @@
 
         <div class="buttons-center">
             {% if session.get('admin') %}
-            <a href="{{ url_for('add_event') }}">➕ Add Event</a>
+            <a href="{{ url_for('events.add_event') }}">➕ Add Event</a>
             {% endif %}
             <a href="{{ url_for('home') }}">🏠 Back to Home</a>
             {% if not session.get('admin') %}
-            <a href="{{ url_for('admin_login') }}">🔐 Admin Login</a>
+            <a href="{{ url_for('admin.admin_login') }}">🔐 Admin Login</a>
             {% endif %}
         </div>
 
