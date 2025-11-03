@@ -16,34 +16,32 @@ def audio():
     """Display all uploaded albums with their songs."""
     albums = {}
 
-    try:
-        results = (
-            cloudinary.Search()
-            .expression("folder:church_albums/** AND resource_type:auto")
-            .sort_by("created_at", "desc")  # show newest first
-            .max_results(100)
-            .execute()
-        )
+    results = cloudinary.Search()\
+        .expression("folder:church_albums/* AND resource_type:video")\
+        .sort_by("public_id", "asc")\
+        .max_results(100)\
+        .execute()
 
-        for item in results.get("resources", []):
-            parts = item["public_id"].split('/')
-            if len(parts) < 2:
-                continue
+    for item in results.get("resources", []):
+        full_path = item["public_id"]  # e.g. church_albums/Yesu_Yuaja/hosanna
+        url = item["secure_url"]
 
-            album_name = parts[1].replace('_', ' ')
-            song_title = parts[-1].split('/')[-1].replace('_', ' ').title()
+        # Split to get album and song name
+        parts = full_path.split('/')
+        if len(parts) < 3:
+            continue
 
-            albums.setdefault(album_name, []).append({
-                "title": song_title,
-                "url": item["secure_url"]
-            })
+        album_slug = parts[1]
+        album_name = album_slug.replace('_', ' ')
+        song_title = parts[2].replace('_', ' ').title()
 
-        # Sort songs alphabetically within each album (optional)
-        for songs in albums.values():
-            songs.sort(key=lambda s: s["title"])
+        if album_name not in albums:
+            albums[album_name] = []
 
-    except Exception as e:
-        flash(f"⚠️ Error fetching songs: {e}")
+        albums[album_name].append({
+            "title": song_title,
+            "url": url
+        })
 
     return render_template("audio.html", albums=albums)
 
