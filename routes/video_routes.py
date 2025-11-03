@@ -59,21 +59,20 @@ def upload_video():
 
     return render_template('upload_video.html')
 
-@video_bp.route('/delete/<public_id>', methods=['POST'])
-def delete_video(public_id):
+
+@video_bp.route('/delete_video/<filename>', methods=['POST'])
+def delete_video(filename):
     if not session.get('admin'):
-        flash('⚠️ Admin access required.')
-        session['next'] = 'video.video_messages'
-        return redirect(url_for('admin.admin_login'))
+        session['next_delete_video'] = filename
+        flash('Admin access required to delete video.')
+        return redirect(url_for('admin_login'))
 
     try:
-        # Delete from Cloudinary
-        cloudinary.uploader.destroy(
-            f"church_videos/{public_id}",
-            resource_type="video"
-        )
-        flash('🗑️ Video deleted successfully!')
+        # Reconstruct the Cloudinary public_id
+        public_id = f"church_videos/{filename.rsplit('.', 1)[0]}"  # remove .mp4
+        cloudinary.uploader.destroy(public_id, resource_type="video")
+        flash(f"Deleted: {filename}")
     except Exception as e:
-        flash(f"⚠️ Error deleting video: {e}")
+        flash(f"Error deleting video: {e}")
 
     return redirect(url_for('video.video_messages'))
