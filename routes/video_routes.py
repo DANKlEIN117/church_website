@@ -34,28 +34,23 @@ def video_messages():
 @video_bp.route('/upload_video', methods=['GET', 'POST'])
 def upload_video():
     if not session.get('admin'):
-        flash('⚠️ Admin access required.')
-        session['next'] = 'video.upload_video'
-        return redirect(url_for('admin.admin_login'))
+        flash('Admin access required to upload videos.')
+        return redirect(url_for('admin_login'))
 
     if request.method == 'POST':
-        file = request.files.get('video')
-
-        if not file or not file.filename.lower().endswith('.mp4'):
-            flash('❌ Invalid file. Only .mp4 videos are allowed.')
-            return redirect(url_for('video.upload_video'))
-
-        try:
-            cloudinary.uploader.upload(
-                file,
-                resource_type="video",
-                folder="church_videos",
-                public_id=file.filename.rsplit('.', 1)[0]
-            )
-            flash('✅ Video uploaded successfully!')
-            return redirect(url_for('video.video_messages'))
-        except Exception as e:
-            flash(f"⚠️ Upload error: {e}")
+        file = request.files['video']
+        if file and file.filename.endswith('.mp4'):
+            try:
+                result = cloudinary.uploader.upload(
+                    file,
+                    resource_type="video",
+                    folder="church_videos"
+                )
+                flash('Video uploaded successfully!')
+                return redirect(url_for('video.video_messages'))
+            except Exception as e:
+                flash(f'Upload error: {e}')
+                return redirect(request.url)
 
     return render_template('upload_video.html')
 
