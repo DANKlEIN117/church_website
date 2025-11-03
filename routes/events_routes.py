@@ -23,52 +23,49 @@ def save_events(events):
 
 @events_bp.route('/events')
 def events():
-    events = load_events()
+    with open('events.json', 'r') as f:
+        events = json.load(f)
     return render_template('events.html', events=events)
-
 
 @events_bp.route('/add_event', methods=['GET', 'POST'])
 def add_event():
     if not session.get('admin'):
-        flash('Admin login required.')
-        session['next'] = 'events.add_event'
-        return redirect(url_for('admin.admin_login'))
+        flash('Admin access required.')
+        session['next'] = 'add_event'
+        return redirect(url_for('admin_login'))
 
     if request.method == 'POST':
-        title = request.form.get('title')
-        date = request.form.get('date')
-        description = request.form.get('description')
+        title = request.form['title']
+        date = request.form['date']
+        description = request.form['description']
 
-        if not title or not date:
-            flash('Title and Date are required.')
-            return redirect(url_for('events.add_event'))
+        with open('events.json', 'r') as f:
+            events = json.load(f)
 
-        events = load_events()
-        events.append({
-            'title': title,
-            'date': date,
-            'description': description,
-            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        })
-        save_events(events)
-        flash('Event added successfully!')
+        event_id = (events[-1]['id'] + 1) if events else 1
+        events.append({"id": event_id, "title": title, "date": date, "description": description})
+
+        with open('events.json', 'w') as f:
+            json.dump(events, f, indent=4)
+
+        flash("Event added.")
         return redirect(url_for('events.events'))
 
     return render_template('add_event.html')
 
-
-@events_bp.route('/delete_event/<int:event_index>', methods=['POST'])
-def delete_event(event_index):
+@events_bp.route('/delete_event/<int:event_id>', methods=['POST'])
+def delete_event(event_id):
     if not session.get('admin'):
-        flash('Admin privileges required.')
-        return redirect(url_for('admin.admin_login'))  # ✅ fixed here
+        flash('Admin access required.')
+        return redirect(url_for('admin_login'))
 
-    events = load_events()
-    if 0 <= event_index < len(events):
-        deleted_event = events.pop(event_index)
-        save_events(events)
-        flash(f"Deleted event '{deleted_event['title']}'")
-    else:
-        flash('Event not found.')
+    with open('events.json', 'r') as f:
+        events = json.load(f)
 
+    events = [e for e in events if e['id'] != event_id]
+
+    with open('events.json', 'w') as f:
+        json.dump(events, f, indent=4)
+
+    flash("Event deleted.")
     return redirect(url_for('events.events'))
