@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         body {
-            font-family: 'High Tower Text', serif;
+            font-family: 'Times New Roman', serif;
             background-color: #38155544;
             padding: 40px 20px;
             color: #333;
@@ -32,7 +32,7 @@
             text-align: left;
             margin-bottom: 30px;
             padding-bottom: 20px;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid #be7a20;
         }
 
         .sermon-item strong {
@@ -83,10 +83,10 @@
     <div class="sermon-list">
         {% for sermon in sermons %}
         <div class="sermon-card">
-        <h3>{{ sermon.title }}</h3>
+        <h2 style="text-align: left; color: #ff5252;">{{ sermon.title }}</h2>
         <p><b>Preacher:</b> {{ sermon.preacher }}</p>
         <p><b>Date:</b> {{ sermon.date }}</p>
-        <p>{{ sermon.message }}</p>
+        <p><b>Summary: </b>{{ sermon.summary }}</p>
 
         {% if session.get('admin') %}
         <form method="POST" action="{{ url_for('sermons.delete_sermon', sermon_index=loop.index0) }}">

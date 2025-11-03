@@ -21,37 +21,42 @@ def save_sermons(sermons):
 
 @sermons_bp.route('/sermons')
 def sermons():
-    sermons = load_sermons()
+    try:
+        with open('sermons.json', 'r') as f:
+            sermons = json.load(f)
+    except:
+        sermons = []
     return render_template('sermons.html', sermons=sermons)
-
 
 @sermons_bp.route('/add_sermon', methods=['GET', 'POST'])
 def add_sermon():
     if not session.get('admin'):
-        flash('⚠️ Admin login required.')
-        session['next'] = 'sermons.add_sermon'
-        return redirect(url_for('admin.admin_login'))
+        flash('Admin access required.')
+        session['next'] = 'add_sermon'
+        return redirect(url_for('admin_login'))
 
     if request.method == 'POST':
-        title = request.form.get('title', '').strip()
-        preacher = request.form.get('preacher', '').strip()
-        date = request.form.get('date', '')
-        message = request.form.get('message', '').strip()
+        title = request.form['title']
+        preacher = request.form['preacher']
+        date = request.form['date']
+        summary = request.form['summary']
 
-        if not title or not preacher:
-            flash('❌ Title and Preacher are required.')
-            return redirect(url_for('sermons.add_sermon'))
+        with open('sermons.json', 'r') as f:
+            sermons = json.load(f)
 
-        sermons = load_sermons()
+        sermon_id = sermons[-1]['id'] + 1 if sermons else 1
         sermons.append({
-            'title': title,
-            'preacher': preacher,
-            'date': date,
-            'message': message,
-            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            "id": sermon_id,
+            "title": title,
+            "preacher": preacher,
+            "date": date,
+            "summary": summary
         })
-        save_sermons(sermons)
-        flash('✅ Sermon added successfully!')
+
+        with open('sermons.json', 'w') as f:
+            json.dump(sermons, f, indent=4)
+
+        flash('Sermon added.')
         return redirect(url_for('sermons.sermons'))
 
     return render_template('add_sermon.html')

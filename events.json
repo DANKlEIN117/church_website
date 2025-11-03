@@ -4,5 +4,11 @@
         "title": "Baptism",
         "date": "2026-02-21",
         "description": "Baptizing new members to christ"
+    },
+    {
+        "id": 4,
+        "title": "Harambe",
+        "date": "2025-11-08",
+        "description": "Contribution toward church building"
     }
 ]

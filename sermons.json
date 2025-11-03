@@ -1,16 +1,16 @@
 [
     {
-        "title": "Coming of Jesus",
+        "id": 1,
+        "title": "Second Comming Of Jesus",
         "preacher": "Pastor Michael",
-        "date": "2023-04-20",
-        "message": "",
-        "created_at": "2025-11-03 02:39:00"
+        "date": "2025-11-08",
+        "summary": "Revelation 23: 1 - 10;"
     },
     {
-        "title": "Feeding the five thousand people",
-        "preacher": "Dan",
-        "date": "2025-06-27",
-        "message": "",
-        "created_at": "2025-11-03 02:39:51"
+        "id": 2,
+        "title": "Moses",
+        "preacher": "Pastor Michael",
+        "date": "2025-11-08",
+        "summary": "Crossing The Red Sea"
     }
 ]
