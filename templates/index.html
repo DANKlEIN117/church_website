@@ -17,6 +17,7 @@
         </div>
         
         <nav class="navbar">
+            <div class="hamburger" onclick="toggleMenu()">☰</div>
             <ul class="nav-menu">
                 <li><a href="#home">Home</a></li>
 
@@ -85,15 +86,30 @@
         <h3>OUR MISSION</h3>
         <p>To reach the unreached and uplift souls through the word of God.</p>
     </section>
-
-    <footer>
-        <p>&copy; 2025 Rapogi Lwanda SDA Church | All Rights Reserved</p>
-    </footer>
-
-    {% if session.get('admin') %}
+    <section class="db">
+        <footer>
+            <p>&copy; 2025 Rapogi Lwanda SDA Church | All Rights Reserved</p>
+        </footer>
+        {% if session.get('admin') %}
         <p>You are logged in as admin</p>
-    {% else %}
-        <a href="{{ url_for('admin.admin_login') }}">🔐 Admin Login</a>
-    {% endif %}
+        {% else %}
+            <a href="{{ url_for('admin.admin_login') }}" class="btn">🔐 Admin Login</a>
+        {% endif %}
+    </section>
+
+    
+
+    <script>
+        function toggleMenu() {
+        const navMenu = document.querySelector('.nav-menu');
+        navMenu.classList.toggle('active');
+        }
+        function button(){
+            button.onclick()
+        }
+
+        
+    </script>
+
 </body>
 </html>

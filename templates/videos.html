@@ -64,11 +64,17 @@
 
         .top-buttons {
             text-align: center;
-            margin-bottom: 30px;
-        }
+            margin-top: 30px;
+            display: flex;              /* enables horizontal alignment */
+            justify-content: center;    /* centers them on the page */
+            gap: 15px;                  /* adds space between buttons */
+            flex-wrap: wrap;
+            
+            }
 
         .top-buttons a {
             margin: 0 10px;
+            display: inline-block;
         }
     </style>
 </head>
@@ -81,10 +87,13 @@
         {% if session.get('admin') %}
             <!-- FIXED: prefixed with blueprint name -->
             <a href="{{ url_for('video.upload_video') }}" class="btn">📤 Upload New Video</a>
+            <a href="{{ url_for('home') }}" class="btn">🏠 Back to Home</a>
+            <a href="https://www.youtube.com/@rapogilwandasdachurchchoir2301" class="btn">📺 Explore on YouTube</a>
+        {% else %}
+            <!-- FIXED: home route is defined in main app -->
+            <a href="{{ url_for('home') }}" class="btn">🏠 Back to Home</a>
+            <a href="https://www.youtube.com/@rapogilwandasdachurchchoir2301" class="btn">📺 Explore on YouTube</a>
         {% endif %}
-        <!-- FIXED: home route is defined in main app -->
-        <a href="{{ url_for('home') }}" class="btn">🏠 Back to Home</a>
-        <a href="https://www.youtube.com/@rapogilwandasdachurchchoir2301" class="btn">📺 Explore on YouTube</a>
     </div>
 
     <div class="video-grid">

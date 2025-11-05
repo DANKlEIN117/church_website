@@ -20,30 +20,34 @@
     }
 
     .album {
-      background: #ffffff;
-      padding: 20px;
+      background: #aa65a1;
+      padding: 5px;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       margin-bottom: 40px;
-      max-width: 800px;
+      max-width: 900px;
       margin-left: auto;
       margin-right: auto;
+      align-content: start;
     }
 
     .album h3 {
-      color: #0d47a1;
-      border-bottom: 1px solid #ddd;
+      color: yellow;
+      border-bottom: 1px solid #6729b8;
       padding-bottom: 10px;
+      text-align: center;
+      font-size: large;
     }
 
     .song-list {
       list-style: decimal inside;
       padding-left: 0;
+      
     }
 
     .song-info {
       display: flex;
-      align-items: center;
+      align-items: start;
       gap: 10px;
       margin: 15px 0;
       flex-wrap: wrap;
@@ -55,13 +59,15 @@
     .song-title {
       font-weight: bold;
       flex: 1;
-      min-width: 100px;
-      max-width: 200px;
+      min-width: 280px;
+      max-width: 280px;
     }
 
     audio {
-      width: 100px;
+      width: 100%;
       outline: none;
+      background-color: yellow;
+      color: blue;
     }
 
     .download-btn {
@@ -72,6 +78,7 @@
       border-radius: 6px;
       font-size: 10px;
       transition: background-color 0.3s ease;
+      width: 40%;
     }
 
     .download-btn:hover {
@@ -81,20 +88,27 @@
     .upload-link {
       text-align: center;
       margin-top: 30px;
+      display: flex;              /* enables horizontal alignment */
+      justify-content: center;    /* centers them on the page */
+      gap: 15px;                  /* adds space between buttons */
+      flex-wrap: wrap;            /* makes them wrap nicely on mobile */
     }
 
     .upload-link a {
       text-decoration: none;
-      background-color: #2d2d7c;
+      background-color: #21c72e;
       color: white;
       padding: 10px 20px;
       border-radius: 8px;
       font-weight: bold;
+      display: inline-block;       /* keeps them side by side */
+      transition: background-color 0.3s ease;
     }
 
     .upload-link a:hover {
-      background-color: #3949ab;
+      background-color: #1127b1;
     }
+
   </style>
 </head>
 <body>
@@ -127,13 +141,15 @@
 
   {% if session.get('admin') %}
     <div class="upload-link">
-      <p><a href="{{ url_for('audio.upload_album') }}">➕ Upload New Album</a></p><br><br>
+      <a href="{{ url_for('audio.upload_album') }}">➕ Upload New Album</a>
+      <a href="{{ url_for('home') }}">🏠 Back to Home</a>
+    </div>
+  {% else %}
+    <div class="upload-link">
+      <a href="{{ url_for('home') }}">🏠 Back to Home</a>
     </div>
   {% endif %}
 
-  <div class="upload-link" style="margin-top: 20px;">
-    <p><a href="{{ url_for('home') }}">🏠 Back to Home</a></p>
-  </div>
 
 </body>
 </html>

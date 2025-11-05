@@ -1,16 +1,17 @@
+/* ======================
+   BASE STYLES
+====================== */
 body {
     margin: 0;
-    font-family: 'High Tower Text', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #19aa86;
+    font-family: 'Times New Roman', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
 }
 
 header {
     background-color: #2d2d7c;
     color: white;
-    padding: 20px;
+    padding: 30px;
     text-align: center;
-    font-family: 'High Tower Text', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 nav a {
@@ -22,41 +23,43 @@ nav a {
 .hero {
     background-image: url('../images/image.png');
     background-size: cover;
-    color: white;
-    padding: 180px 20px;
-    text-align: center;
     background-position: center;
-    font-family: 'High Tower Text', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    padding: 280px 20px;
+    text-align: center;
 }
 
 .mission {
-    background-color: rgba(209, 105, 183, 0.932);
-    padding: 40px 20px;
+    background-color: rgba(150, 118, 192, 0.932);
+    padding: 10px 20px;
     text-align: center;
-    font-family: 'High Tower Text', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 footer {
-    background-color: #62646400;
-    color: white;
+    background-color: transparent;
+    color: rgb(32, 139, 131);
     text-align: center;
-    padding: 10px;
+    padding: 2px;
+}
+.db{
+    background-color: #dbcbdb;
 }
 
+/* ======================
+   HEADER & NAVBAR
+====================== */
 .header-content {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 20px;
-    font-family: 'High Tower Text', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .logo {
     height: 100px;
     width: 200px;
-    background-color: #0c0b0b00;
+    background-color: transparent;
     transition: transform 0.5s ease, box-shadow 0.5s ease;
-
 }
 
 .logo:hover {
@@ -64,10 +67,10 @@ footer {
     box-shadow: 0 0 15px rgba(173, 22, 187, 0.7);
 }
 
-/* NAVBAR STYLING */
 .navbar {
     background-color: #2d2d7c;
     padding: 10px 20px;
+    position: relative;
 }
 
 .nav-menu {
@@ -77,7 +80,6 @@ footer {
     justify-content: center;
     margin: 0;
     padding: 0;
-    font-family: 'High Tower Text', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .nav-menu li {
@@ -90,10 +92,13 @@ footer {
     padding: 10px;
     display: block;
     font-weight: bold;
-    font-family: 'High Tower Text', Tahoma, Geneva, Verdana, sans-serif;
+    transition: color 0.3s ease;
 }
 
-/* DROPDOWN STYLE */
+.nav-menu a:hover {
+    color: #ffd700;
+}
+
 .dropdown-content {
     display: none;
     position: absolute;
@@ -104,7 +109,6 @@ footer {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     z-index: 999;
     border-radius: 6px;
-    font-family: 'High Tower Text', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .dropdown-content li a {
@@ -121,6 +125,16 @@ footer {
     display: block;
 }
 
+.hamburger {
+    display: none;
+    cursor: pointer;
+    font-size: 28px;
+    color: white;
+}
+
+/* ======================
+   AUDIO LIBRARY SECTION
+====================== */
 .audio-library {
     background-color: #aca9d4;
     padding: 60px 20px;
@@ -149,58 +163,10 @@ footer {
     margin-bottom: 20px;
 }
 
-.song {
-    margin-bottom: 20px;
-}
-
 .song audio {
     width: 100%;
     outline: none;
 }
-
-.album {
-    margin-bottom: 40px;
-    padding: 20px;
-    background-color: #eeeeee15;
-    border-radius: 15px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.2);
-}
-.song {
-    margin-bottom: 10px;
-}
-.album ol {
-    padding-left: 20px;
-    color: #e00d0d;
-    font-size: 18px;
-    line-height: 1.8;
-}
-.album li {
-    margin-bottom: 8px;
-}
-.song-list {
-    list-style-position: inside;
-    text-align: left;
-    margin-left: 0;
-    padding-left: 0;
-    font-size: 18px;
-    color: #8ac719;
-}
-
-.song-list li {
-    margin-bottom: 10px;
-    line-height: 1.6;
-}
-.album {
-    max-width: 600px;
-    margin: 30px auto;
-    padding: 20px;
-    background-color: #862b7315;
-    border-radius: 15px;
-    box-shadow: 0 0 8px rgba(14, 47, 235, 0.2);
-    text-align: left;
-}
-
-
 
 .song-list {
     list-style-position: inside;
@@ -223,13 +189,14 @@ footer {
 
 .song-title {
     flex: 1;
+    font-weight: bold;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.btn {
-    background-color: #00bfa5;
+.btn, .download-btn {
+    background-color: gold;
     color: white;
     text-decoration: none;
     padding: 6px 12px;
@@ -239,209 +206,8 @@ footer {
     transition: background-color 0.3s ease;
 }
 
-.btn:hover {
+.btn:hover, .download-btn:hover {
     background-color: #1de9b6;
-}
-
-.song-list {
-    list-style: decimal inside;
-    padding-left: 0;
-    font-size: 18px;
-    color: #fff;
-}
-
-.song-list li {
-    margin-bottom: 20px;
-}
-
-.song-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
-    background-color: rgba(255, 255, 255, 0.05);
-    padding: 10px 15px;
-    border-radius: 8px;
-}
-
-.song-title {
-    flex: 1;
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.audio-player {
-    width: 180px;
-}
-
-.download-btn {
-    background-color: #00bfa5;
-    color: white;
-    text-decoration: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-}
-
-.download-btn:hover {
-    background-color: #1de9b6;
-}
-
-.delete-btn {
-    background-color: #ff5252;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    margin-left: 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-}
-
-.delete-btn:hover {
-    background-color: #ff1744;
-}
-
-.lightbox {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.95);
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    overflow: hidden;
-}
-
-.lightbox:target {
-    display: flex;
-}
-
-.lightbox img {
-    max-width: 200vw;
-    max-height: 200vh;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    border-radius: 10px;
-    box-shadow: 0 0 30px rgba(255,255,255,0.2);
-}
-
-.lightbox .close {
-    position: absolute;
-    top: 15px;
-    right: 30px;
-    font-size: 40px;
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    z-index: 10000;
-}
-
-.back-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: #b2dfdb;
-            text-decoration: none;
-        }
-
-.back-link:hover {
-    text-decoration: underline;
-}
-
-
-.gallery-actions {
-    margin-top: 40px;
-    text-align: center;
-    padding: 20px;
-}
-
-.gallery-actions .btn {
-    background-color: #006d77;
-    color: white;
-    text-decoration: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    margin: 10px;
-    display: inline-block;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-.gallery-actions .btn:hover {
-    background-color: #009688;
-}
-
-.event-box {
-    margin-top: 30px;
-    background: #ffffffcc;
-    border-radius: 10px;
-    padding: 20px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    text-align: left;
-}
-
-.event-box h3 {
-    color: #2d2d7c;
-    margin-bottom: 15px;
-}
-
-.event-box ul {
-    list-style: none;
-    padding: 0;
-}
-
-.event-box li {
-    margin-bottom: 10px;
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-.upload-btn {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 10px 20px;
-    background-color: #006d77;
-    color: white;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-}
-
-.upload-btn:hover {
-    background-color: #00bfa5;
-}
-
-.upload-btn,
-.download-link {
-    display: inline-block;
-    margin: 15px 10px;
-    padding: 12px 24px;
-    background: linear-gradient(to right, #bfa300, #ffd700);
-    color: #2d2d7c;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 10px;
-    font-size: 16px;
-    box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
-    transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.upload-btn:hover,
-.download-link:hover {
-    background: linear-gradient(to right, #ffd700, #bfa300);
-    transform: scale(1.05);
 }
 
 .delete-btn {
@@ -461,49 +227,92 @@ footer {
     transform: scale(1.05);
 }
 
+/* ======================
+   MOBILE RESPONSIVENESS
+====================== */
 @media (max-width: 768px) {
     .header-content {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
     }
 
     .logo {
-        width: 100px;
-        height: auto;
+        width: 40px;
+        height: 38px;
+    }
+    h1{
+        font-size: 8px;
+    }
+
+    .hamburger {
+        display: block;
+        position: absolute;
+        top: 25px;
+        right: 25px;
+        z-index: 1000;
     }
 
     .nav-menu {
         flex-direction: column;
-        gap: 10px;
+        align-items: flex-start;
+        background-color: #2d2d7c;
+        width: 100%;
+        position: absolute;
+        top: 80px;
+        left: 0;
+        padding: 10px 0;
+        display: none;
+        border-top: 1px solid rgba(255,255,255,0.2);
+        z-index: 999;
     }
 
-    .hero {
-        padding: 100px 10px;
+    .nav-menu.active {
+        display: flex;
     }
 
-    .album,
-    .upload-container,
-    .video-grid,
-    .gallery-grid {
+    .nav-menu li {
+        width: 100%;
+        text-align: left;
+    }
+
+    .nav-menu a {
+        width: 100%;
+        padding: 12px 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .dropdown-content {
+        position: static;
+        background-color: #3a3a8c;
+        border-radius: 0;
+    }
+
+    .dropdown-content li a {
+        padding-left: 30px;
+        color: #fff;
+    }
+
+    .album, .upload-container, .video-grid, .gallery-grid {
         width: 100%;
         padding: 10px;
         box-sizing: border-box;
-    }
-
-    audio,
-    video {
-        width: 100%;
-    }
-
-    .song-info,
-    .song-list li {
-        flex-direction: column;
-        align-items: flex-start;
     }
 
     .btn, .download-btn, .delete-btn {
         width: 100%;
         text-align: center;
     }
+    footer{
+        padding: 4px 0;
+    }
+    .hero {
+        background-image: url('../images/image.png');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 280px 20px;
+        text-align: center;
+    }
+
 }
