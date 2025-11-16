@@ -150,6 +150,25 @@
     </div>
   {% endif %}
 
+  <script>
+    // When one audio starts playing, pause all other audio elements.
+    (function() {
+      const audios = Array.from(document.querySelectorAll('audio'));
+      if (!audios.length) return;
+      audios.forEach(audio => {
+        audio.addEventListener('play', () => {
+          audios.forEach(other => {
+            if (other !== audio) {
+              try { 
+              other.pause(); 
+              other.currentTime = 0;
+              } catch (e) { /* ignore */ }
+            }
+          });
+        });
+      });
+    })();
+  </script>
 
 </body>
 </html>
