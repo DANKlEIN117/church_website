@@ -35,6 +35,18 @@
             text-align: center;
         }
 
+        /* Visual indicator for currently playing video */
+        .video-card.playing {
+            box-shadow: 0 0 24px rgba(255, 215, 0, 0.95);
+            transform: scale(1.02);
+            border: 2px solid gold;
+        }
+
+        .video-card.playing .video-title {
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+        }
+
         .video-card video {
             width: 100%;
             border-radius: 10px;
@@ -114,6 +126,46 @@
         </div>
         {% endfor %}
     </div>
+
+    <script>
+        // Ensure only one <video> plays at a time and show a visual indicator
+        (function() {
+            const vids = Array.from(document.querySelectorAll('video'));
+            if (!vids.length) return;
+
+            function clearPlayingClasses() {
+                document.querySelectorAll('.video-card.playing').forEach(c => c.classList.remove('playing'));
+            }
+
+            vids.forEach(v => {
+                const card = v.closest('.video-card');
+
+                v.addEventListener('play', () => {
+                    // Pause other videos
+                    vids.forEach(other => {
+                        if (other !== v) {
+                            try { 
+                                other.pause();
+                                other.currentTime = 0; 
+                            } catch (e) { /* ignore */ }
+                        }
+                    });
+
+                    // Update visual state
+                    clearPlayingClasses();
+                    if (card) card.classList.add('playing');
+                });
+
+                // Remove visual indicator on pause or when ended
+                v.addEventListener('pause', () => {
+                    if (card) card.classList.remove('playing');
+                });
+                v.addEventListener('ended', () => {
+                    if (card) card.classList.remove('playing');
+                });
+            });
+        })();
+    </script>
 
 </body>
 

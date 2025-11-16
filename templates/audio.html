@@ -56,6 +56,19 @@
       border-radius: 10px;
     }
 
+    /* Visual indicator for currently playing audio */
+    .song-info.playing {
+      box-shadow: 0 0 18px rgba(255, 215, 0, 0.9);
+      transform: translateY(-2px);
+      border: 2px solid gold;
+      background-color: #244ea8;
+    }
+
+    .song-info.playing .song-title {
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    }
+
     .song-title {
       font-weight: bold;
       flex: 1;
@@ -151,20 +164,38 @@
   {% endif %}
 
   <script>
-    // When one audio starts playing, pause all other audio elements.
+    // When one audio starts playing, pause all other audio elements
+    // and add a visual `.playing` class to the corresponding .song-info.
     (function() {
       const audios = Array.from(document.querySelectorAll('audio'));
       if (!audios.length) return;
+
+      function clearPlaying() {
+        document.querySelectorAll('.song-info.playing').forEach(card => card.classList.remove('playing'));
+      }
+
       audios.forEach(audio => {
+        const card = audio.closest('.song-info');
+
         audio.addEventListener('play', () => {
+          // Pause other audios
           audios.forEach(other => {
             if (other !== audio) {
-              try { 
-              other.pause(); 
-              other.currentTime = 0;
-              } catch (e) { /* ignore */ }
+              try { other.pause(); other.currentTime = 0; } catch (e) {}
             }
           });
+
+          // Update visual state
+          clearPlaying();
+          if (card) card.classList.add('playing');
+        });
+
+        // Remove visual indicator on pause or end
+        audio.addEventListener('pause', () => {
+          if (card) card.classList.remove('playing');
+        });
+        audio.addEventListener('ended', () => {
+          if (card) card.classList.remove('playing');
         });
       });
     })();
