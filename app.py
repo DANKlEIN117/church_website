@@ -24,7 +24,45 @@ register_blueprints(app)
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    # Load events and compute simple upcoming / past summaries for home notifications
+    events = []
+    try:
+        with open('events.json', 'r') as f:
+            events = json.load(f)
+    except Exception:
+        events = []
+
+    from datetime import datetime, date
+    today = date.today()
+    upcoming = []
+    past = []
+    for e in events:
+        try:
+            d = datetime.fromisoformat(e.get('date')).date()
+        except Exception:
+            continue
+        if d >= today:
+            upcoming.append((d, e))
+        else:
+            past.append((d, e))
+
+    upcoming.sort(key=lambda x: x[0])
+    past.sort(key=lambda x: x[0], reverse=True)
+
+    events_summary = {
+        'upcoming_count': len(upcoming),
+        'past_count': len(past),
+        'upcoming': [ {'date': d.isoformat(), 'title': ev.get('title','')} for d, ev in upcoming[:3] ],
+        'past': [ {'date': d.isoformat(), 'title': ev.get('title','')} for d, ev in past[:3] ],
+    }
+
+    return render_template('index.html', events_summary=events_summary)
+
+
+# Simple calendar route so the calendar page can be reached from the nav
+@app.route('/calendar')
+def calendar():
+    return render_template('calendar.html')
 
 
 # Error handlers (optional but pro)

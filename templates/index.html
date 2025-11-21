@@ -6,6 +6,21 @@
     <title>WELCOME TO RAPOGI LWANDA SDA CHURCH</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <meta name="google-site-verification" content="ejyl8phtGqzQGgRFI-mISI6tAkYYoQ-YNaWshQsraPE" />
+    <style>
+        /* Notification bell dropdown */
+        .nav-notify { position: relative; }
+        .bell-btn { background: transparent; border: none; font-size: 1.0rem; cursor: pointer; display:flex; align-items:center; gap:6px; }
+        .bell-badge { background:#ff3b30; color:rgb(53, 49, 49); padding:2px 6px; border-radius:999px; font-size:0.75rem; font-weight:700; margin-left:6px; }
+        .notify-dropdown { position: absolute; right: 0; top: 36px; width: 320px; max-width: calc(100vw - 32px); background: white; border-radius:8px; box-shadow: 0 8px 32px rgba(15,23,42,0.12); border:1px solid rgba(2,6,23,0.06); z-index:1200; }
+        .notify-header{padding:10px 14px;border-bottom:1px solid rgba(2,6,23,0.04);font-weight:700;color:#0f172a}
+        .notify-body{max-height:280px;overflow:auto;padding:8px 12px}
+        .notify-section{margin-bottom:8px}
+        .notify-section ul{margin:6px 0 0 14px;padding:0;color:#374151}
+        .notify-footer{padding:8px 8px;border-top:1px solid rgba(2,6,23,0.04);text-align:right; background-color: #374151;}
+        .notify-item.upcoming{background:linear-gradient(90deg,#cf8a35,#3816ce);padding:8px;border-radius:6px;margin-bottom:6px}
+        .notify-item.past{opacity:0.7;padding:8px;border-radius:6px;margin-bottom:6px}
+        @media (max-width:520px){ .notify-dropdown{right:6px;left:6px;top:42px;width:auto} }
+    </style>
 </head>
 
 <body>
@@ -20,6 +35,7 @@
             <div class="hamburger" onclick="toggleMenu()">☰</div>
             <ul class="nav-menu">
                 <li><a href="#home">Home</a></li>
+                
 
                 <li class="dropdown">
                     <a href="#about">About Us</a>
@@ -43,7 +59,7 @@
                     <a href="#events">Events</a>
                     <ul class="dropdown-content">
                         <li><a href="{{ url_for('events.events') }}">Upcoming Events</a></li>
-                        <li><a href="#">Church Calendar</a></li>
+                        <li><a href="{{ url_for('calendar') }}">Church Calendar</a></li>
                         <li><a href="{{ url_for('gallery.gallery') }}">Church Gallery</a></li>
                     </ul>
                 </li>
@@ -69,6 +85,34 @@
                 </li>
 
                 <li><a href="#contact">Contact</a></li>
+                <li class="nav-notify">
+                    <div class="notify-wrapper">
+                        <button id="bellBtn" class="bell-btn" aria-haspopup="true" aria-expanded="false" title="Notifications">🔔
+                            {% if events_summary and events_summary.upcoming_count %}
+                                <span class="bell-badge">{{ events_summary.upcoming_count }}</span>
+                            {% endif %}
+                        </button>
+
+                        <div id="bellDropdown" class="notify-dropdown" hidden aria-hidden="true">
+                            <div class="notify-header">Notifications</div>
+                            <div class="notify-body">
+                                <div class="notify-section">
+                                    <strong>Upcoming</strong>
+                                    <div id="notify-upcoming">
+                                        <div class="notify-loading">Loading…</div>
+                                    </div>
+                                </div>
+                                <div class="notify-section">
+                                    <strong>Recent past</strong>
+                                    <div id="notify-past">
+                                        <div class="notify-loading">Loading…</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notify-footer"><a href="{{ url_for('calendar') }}">View full calendar ▸</a></div>
+                        </div>
+                    </div>
+                </li>
 
                 {% if session.get('admin') %}
                     <li><a href="{{ url_for('admin.logout') }}">🚪 Logout</a></li>
@@ -107,6 +151,106 @@
         function button(){
             button.onclick()
         }
+
+        // Notifications dropdown behavior
+        (function(){
+            const bell = document.getElementById('bellBtn');
+            const dropdown = document.getElementById('bellDropdown');
+            if (!bell || !dropdown) return;
+
+            let loaded = false;
+
+            function renderNotifications(data){
+                const upEl = document.getElementById('notify-upcoming');
+                const pastEl = document.getElementById('notify-past');
+                upEl.innerHTML = '';
+                pastEl.innerHTML = '';
+
+                const today = new Date();
+                const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+                const upcoming = [];
+                const past = [];
+                (data || []).forEach(ev=>{
+                    // expect ev.date YYYY-MM-DD
+                    const parts = ev.date.split('-');
+                    if (parts.length !== 3) return;
+                    const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+                    if (d >= todayOnly) upcoming.push({d, ev}); else past.push({d, ev});
+                });
+
+                upcoming.sort((a,b)=>a.d - b.d);
+                past.sort((a,b)=>b.d - a.d);
+
+                const upList = document.createElement('div');
+                if (upcoming.length){
+                    upcoming.slice(0,5).forEach(item=>{
+                        const node = document.createElement('div'); node.className='notify-item upcoming';
+                        node.textContent = `${item.d.toISOString().slice(0,10)} — ${item.ev.title}`;
+                        upList.appendChild(node);
+                    });
+                } else {
+                    upList.innerHTML = '<div class="notify-item">No upcoming events</div>';
+                }
+                upEl.appendChild(upList);
+
+                const pastList = document.createElement('div');
+                if (past.length){
+                    past.slice(0,5).forEach(item=>{
+                        const node = document.createElement('div'); node.className='notify-item past';
+                        node.textContent = `${item.d.toISOString().slice(0,10)} — ${item.ev.title}`;
+                        pastList.appendChild(node);
+                    });
+                } else {
+                    pastList.innerHTML = '<div class="notify-item">No past events</div>';
+                }
+                pastEl.appendChild(pastList);
+
+                // update badge
+                const badge = document.querySelector('.bell-badge');
+                if (badge){
+                    if (upcoming.length) badge.textContent = String(upcoming.length); else badge.remove();
+                }
+            }
+
+            function fetchNotifications(){
+                const upEl = document.getElementById('notify-upcoming');
+                const pastEl = document.getElementById('notify-past');
+                if (upEl) upEl.innerHTML = '<div class="notify-loading">Loading…</div>';
+                if (pastEl) pastEl.innerHTML = '<div class="notify-loading">Loading…</div>';
+                return fetch('/events/data').then(r=>r.json()).then(data=>{ renderNotifications(data); loaded = true; }).catch(err=>{
+                    const up = document.getElementById('notify-upcoming'); if (up) up.innerHTML = '<div class="notify-item">Unable to load</div>';
+                    const pa = document.getElementById('notify-past'); if (pa) pa.innerHTML = '<div class="notify-item">Unable to load</div>';
+                });
+            }
+
+            function openDropdown(){
+                dropdown.hidden = false;
+                dropdown.setAttribute('aria-hidden','false');
+                bell.setAttribute('aria-expanded','true');
+                // fetch data when opening for the first time
+                if (!loaded) fetchNotifications();
+            }
+            function closeDropdown(){
+                dropdown.hidden = true;
+                dropdown.setAttribute('aria-hidden','true');
+                bell.setAttribute('aria-expanded','false');
+            }
+
+            bell.addEventListener('click', (e)=>{
+                if (dropdown.hidden) openDropdown(); else closeDropdown();
+            });
+
+            // close when clicking outside
+            document.addEventListener('click', (e)=>{
+                if (!dropdown.hidden && !dropdown.contains(e.target) && e.target !== bell){
+                    closeDropdown();
+                }
+            });
+
+            // close on escape
+            document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeDropdown(); });
+        })();
 
         
     </script>

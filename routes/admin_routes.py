@@ -24,7 +24,8 @@ def admin_login():
                     return redirect(url_for(next_page))
                 except:
                     flash("⚠️ Couldn't redirect to the next page.")
-            
+
+            # Default admin landing
             return redirect(url_for('home'))
         else:
             flash('❌ Invalid credentials. Try again.')
@@ -37,3 +38,6 @@ def logout():
     session.pop('admin', None)
     flash('👋 Logged out successfully.')
     return redirect(url_for('home'))
+
+
+

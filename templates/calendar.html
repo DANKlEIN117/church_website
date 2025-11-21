@@ -7,54 +7,336 @@
     <title>📅 Church Calendar 2025 | Rapogi Lwanda SDA</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        body {
-            font-family: 'High Tower Text', sans-serif;
-            background-color: #f2f2f2;
-            text-align: center;
-            padding: 40px;
+        :root{
+            --primary:#1e3a8a; /* deep blue */
+            --accent:#f59e0b;  /* gold */
+            --muted:#6b7280;
+            --card:#ffffff;
         }
 
-        h2 {
-            color: #2d2d7c;
-            margin-bottom: 30px;
+        html,body{
+            height:100%;
+            margin:0;
+            font-family: 'High Tower Text', 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, #e6eefc 0%, #f8fbff 50%, #f2f6ff 100%);
+            color: #0f172a;
         }
 
-        iframe {
+        .calendar-wrap{
+            max-width:1100px;
+            margin:36px auto;
+            padding:28px;
+            background: var(--card);
+            border-radius:16px;
+            box-shadow: 0 10px 30px rgba(16,24,40,0.08);
+            border: 1px solid rgba(30,58,138,0.06);
+        }
+
+        .calendar-header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:16px;
+            margin-bottom:18px;
+            flex-wrap:wrap;
+        }
+
+        .calendar-title{
+            display:flex;
+            flex-direction:column;
+            gap:6px;
+        }
+
+        .calendar-title h2{
+            margin:0;
+            font-size:1.6rem;
+            color:var(--primary);
+            letter-spacing:0.2px;
+        }
+
+        .calendar-title p{
+            margin:0;
+            color:var(--muted);
+            font-size:0.95rem;
+        }
+
+        .calendar-actions{
+            display:flex;
+            gap:10px;
+            align-items:center;
+        }
+
+        /* calendar grid */
+        #calendar{margin-top:12px}
+        .weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:8px 6px;color:var(--muted);font-weight:700}
+        .weekdays div{text-align:center}
+        .days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:6px}
+        .day-cell{min-height:86px;background:linear-gradient(180deg,#ffffff,#fbfdff);border-radius:8px;padding:8px;position:relative;border:1px solid rgba(2,6,23,0.04);cursor:pointer;display:flex;flex-direction:column}
+        .day-cell.muted{opacity:0.45;background:transparent}
+        .day-cell .num{font-size:0.95rem;color:var(--muted);font-weight:700}
+        .day-cell .dots{margin-top:auto;display:flex;gap:6px}
+        .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block;box-shadow:0 2px 6px rgba(245,158,11,0.18)}
+        .day-cell.today{box-shadow:0 6px 18px rgba(30,64,175,0.12);border:2px solid rgba(30,64,175,0.12)}
+        .day-cell.selected{outline:3px solid rgba(34,77,176,0.12)}
+
+        /* past vs upcoming visuals */
+        .day-cell.past{background:#fbfbfd;color:#64748b}
+        .day-cell.upcoming{background:linear-gradient(180deg,#ffffff,#fcfff5)}
+        .dot{transition:transform .12s ease}
+
+        .event-list{margin-top:12px;padding:12px;border-radius:10px;background:#fbfdff;border:1px solid rgba(2,6,23,0.04)}
+        .event-item{padding:10px;border-bottom:1px dashed rgba(2,6,23,0.04)}
+        .event-item:last-child{border-bottom:none}
+        .ev-title{font-weight:700;color:var(--primary)}
+        .ev-desc{color:var(--muted);font-size:0.95rem;margin-top:6px}
+        .event-item.past-item{opacity:0.7}
+        .event-item.upcoming-item{border-left:4px solid var(--accent);padding-left:10px}
+
+        .event-list{margin-top:12px;padding:12px;border-radius:10px;background:#fbfdff;border:1px solid rgba(2,6,23,0.04)}
+        .event-item{padding:10px;border-bottom:1px dashed rgba(2,6,23,0.04)}
+        .event-item:last-child{border-bottom:none}
+        .ev-title{font-weight:700;color:var(--primary)}
+        .ev-desc{color:var(--muted);font-size:0.95rem;margin-top:6px}
+
+        .btn{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding:10px 14px;
+            border-radius:10px;
+            text-decoration:none;
+            font-weight:600;
             border: none;
-            width: 95%;
-            height: 90vh;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
+            cursor:pointer;
         }
 
-        .download-link {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #006d77;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
+        .btn-primary{
+            background: linear-gradient(90deg,var(--primary), #234db0);
+            color:white;
+            box-shadow: 0 6px 18px rgba(35,77,176,0.14);
         }
 
-        .download-link:hover {
-            background-color: #00bfa5;
+        .btn-ghost{
+            background:transparent;
+            color:var(--primary);
+            border:1px solid rgba(30,58,138,0.08);
+        }
+
+        .pdf-frame{
+            width:100%;
+            height:70vh;
+            border-radius:12px;
+            border:1px solid rgba(2,6,23,0.04);
+            box-shadow: 0 8px 24px rgba(15,23,42,0.06);
+        }
+
+        .fallback-msg{
+            margin-top:12px;
+            color:var(--muted);
+            font-size:0.95rem;
+        }
+
+        .meta-row{
+            margin-top:14px;
+            display:flex;
+            gap:12px;
+            flex-wrap:wrap;
+            align-items:center;
+        }
+
+        @media (max-width:720px){
+            .calendar-wrap{padding:18px;margin:18px}
+            .calendar-actions{width:100%;justify-content:flex-start}
+            .pdf-frame{height:60vh}
         }
     </style>
 </head>
 
 <body>
 
-    <h2>📅 2025 Church Calendar</h2>
+    <div class="calendar-wrap">
+        <div class="calendar-header">
+            <div class="calendar-title">
+                <h2>📅 Church Calendar</h2>
+                <p id="calendar-sub">Browse scheduled church events — click a date to view details.</p>
+            </div>
 
-    <iframe src="{{ url_for('static', filename='calendar/2025_calendar.pdf') }}"></iframe>
+            <div class="calendar-actions">
+                <a class="btn btn-ghost" href="{{ url_for('home') }}">🏠 Home</a>
+                <button id="prevMonth" class="btn btn-ghost">◀ Prev</button>
+                <div style="min-width:160px; text-align:center; font-weight:700; color:var(--primary);" id="monthLabel">Month</div>
+                <button id="nextMonth" class="btn btn-ghost">Next ▶</button>
+                <a class="btn btn-primary" id="downloadPdf" href="{{ url_for('static', filename='calendar/2025_calendar.pdf') }}" download>⬇️ Download PDF</a>
+            </div>
+        </div>
 
-    <br>
-    <a class="download-link" href="{{ url_for('static', filename='calendar/2025_calendar.pdf') }}" download>
-        ⬇️ Download PDF
-    </a>
-    <a href="{{ url_for('home') }}" class="download-link">🏠 Back to Home</a>
+        <div id="calendar" aria-label="Church event calendar">
+            <div class="weekdays">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+            <div class="days" id="daysContainer"></div>
+        </div>
+
+        <div class="meta-row">
+            <div id="eventsForDay" class="event-list"><h3>Events</h3><div id="eventsContainer"><em>Select a date to see events.</em></div></div>
+        </div>
+    </div>
+
+    <script>
+        // Interactive calendar: fetch events from /events/data and render month grid
+        (function(){
+            const daysContainer = document.getElementById('daysContainer');
+            const monthLabel = document.getElementById('monthLabel');
+            const eventsContainer = document.getElementById('eventsContainer');
+
+            let events = [];
+            // map by date yyyy-mm-dd
+            const eventsMap = {};
+
+            function ymd(d){
+                const Y = d.getFullYear();
+                const M = String(d.getMonth()+1).padStart(2,'0');
+                const D = String(d.getDate()).padStart(2,'0');
+                return `${Y}-${M}-${D}`;
+            }
+
+            function loadEvents(){
+                return fetch('/events/data').then(r=>r.json()).then(data=>{
+                    events = data || [];
+                    events.forEach(e=>{
+                        const d = e.date; // expected YYYY-MM-DD
+                        if (!eventsMap[d]) eventsMap[d]=[];
+                        eventsMap[d].push(e);
+                    });
+                }).catch(()=>{ events = []; });
+            }
+
+            function formatMonthLabel(date){
+                return date.toLocaleString(undefined, { month: 'long', year: 'numeric' });
+            }
+
+            function buildCalendar(reference){
+                daysContainer.innerHTML = '';
+                const firstOfMonth = new Date(reference.getFullYear(), reference.getMonth(), 1);
+                const startDay = firstOfMonth.getDay();
+                const daysInMonth = new Date(reference.getFullYear(), reference.getMonth()+1, 0).getDate();
+
+                // previous month's tail
+                const prevDays = startDay;
+                const prevMonthLastDate = new Date(reference.getFullYear(), reference.getMonth(), 0).getDate();
+
+                // total cells: prevDays + daysInMonth, optionally fill to complete weeks
+                const total = prevDays + daysInMonth;
+                const weeks = Math.ceil(total / 7);
+                const cells = weeks * 7;
+
+                for(let i=0;i<cells;i++){
+                    const cell = document.createElement('div');
+                    cell.className = 'day-cell';
+
+                    const dayIndex = i - prevDays + 1;
+                    let cellDate = null;
+                    if (dayIndex <= 0){
+                        // previous month
+                        const num = prevMonthLastDate + dayIndex;
+                        cell.classList.add('muted');
+                        cell.innerHTML = `<div class="num">${num}</div>`;
+                    } else if (dayIndex > daysInMonth){
+                        // next month
+                        const num = dayIndex - daysInMonth;
+                        cell.classList.add('muted');
+                        cell.innerHTML = `<div class="num">${num}</div>`;
+                    } else {
+                        const num = dayIndex;
+                        cellDate = new Date(reference.getFullYear(), reference.getMonth(), num);
+                        const iso = ymd(cellDate);
+                        cell.innerHTML = `<div class="num">${num}</div>`;
+                        if (eventsMap[iso]){
+                            const dots = document.createElement('div');
+                            dots.className = 'dots';
+                            eventsMap[iso].slice(0,3).forEach(ev=>{
+                                const d = document.createElement('span');
+                                d.className='dot';
+                                d.title = ev.title;
+                                // color dot based on past/upcoming
+                                const todayCheck = new Date();
+                                const evDate = new Date(iso+'T00:00:00');
+                                if (evDate < new Date(todayCheck.getFullYear(), todayCheck.getMonth(), todayCheck.getDate())){
+                                    d.style.background = '#94a3b8'; // muted for past
+                                } else {
+                                    d.style.background = 'var(--accent)'; // accent for upcoming
+                                }
+                                dots.appendChild(d);
+                            });
+                            cell.appendChild(dots);
+                        }
+
+                        // today highlight and past/upcoming classes
+                        const today = new Date();
+                        const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                        if (cellDate.toDateString() === today.toDateString()){
+                            cell.classList.add('today');
+                        }
+                        if (cellDate < todayOnly){
+                            cell.classList.add('past');
+                        } else {
+                            cell.classList.add('upcoming');
+                        }
+
+                        cell.addEventListener('click', ()=>{
+                            showEventsForDate(iso, cellDate);
+                            // highlight selected
+                            document.querySelectorAll('.day-cell.selected').forEach(n=>n.classList.remove('selected'));
+                            cell.classList.add('selected');
+                        });
+                    }
+
+                    daysContainer.appendChild(cell);
+                }
+
+                monthLabel.textContent = formatMonthLabel(reference);
+            }
+
+            function showEventsForDate(iso, date){
+                eventsContainer.innerHTML = '';
+                    const title = document.createElement('div');
+                    title.innerHTML = `<strong>${date.toDateString()}</strong>`;
+                    eventsContainer.appendChild(title);
+
+                    const list = document.createElement('div');
+                    const today = new Date();
+                    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                    if (eventsMap[iso] && eventsMap[iso].length){
+                        eventsMap[iso].forEach(ev=>{
+                            const item = document.createElement('div');
+                            item.className = 'event-item';
+                            // mark event item as past/upcoming
+                            const evDate = new Date(iso+'T00:00:00');
+                            if (evDate < todayOnly){
+                                item.classList.add('past-item');
+                            } else {
+                                item.classList.add('upcoming-item');
+                            }
+                            item.innerHTML = `<div class="ev-title">${ev.title}</div><div class="ev-desc">${ev.description || ''}</div>`;
+                            list.appendChild(item);
+                        });
+                    } else {
+                        list.innerHTML = '<em>No events for this date.</em>';
+                    }
+                    eventsContainer.appendChild(list);
+            }
+
+            // navigation
+            let current = new Date();
+            document.getElementById('prevMonth').addEventListener('click', ()=>{ current = new Date(current.getFullYear(), current.getMonth()-1, 1); buildCalendar(current); });
+            document.getElementById('nextMonth').addEventListener('click', ()=>{ current = new Date(current.getFullYear(), current.getMonth()+1, 1); buildCalendar(current); });
+
+            // init
+            loadEvents().then(()=>{
+                buildCalendar(current);
+            });
+        })();
+    </script>
 
 
     {% if session.get('admin') %}

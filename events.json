@@ -1,14 +1,14 @@
 [
     {
-        "id": 3,
-        "title": "Baptism",
-        "date": "2026-02-21",
-        "description": "Baptizing new members to christ"
+        "id": 1,
+        "title": "Harambe",
+        "date": "2025-12-10",
+        "description": "Contribution towards church building\r\n"
     },
     {
-        "id": 4,
-        "title": "Harambe",
-        "date": "2025-11-08",
-        "description": "Contribution toward church building"
+        "id": 2,
+        "title": "Christmas",
+        "date": "2025-12-25",
+        "description": "Christmass day for all christians"
     }
 ]
