@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Contributions — Rapogi Lwanda SDA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <h2>Contributions</h2>
+
+    <main style="max-width:900px;margin:20px auto;padding:10px;">
+      {% if active_campaign %}
+        <div style="max-width:900px;margin:0 auto 18px;padding:12px;border:1px solid #e6e6e6;border-radius:8px;background:#f9f9ff;">
+          <h3 style="margin:0 0 6px 0">Current Campaign: {{ active_campaign.title }}</h3>
+          <div style="color:#555">Target: Ksh {{ active_campaign.target_amount }} — {{ active_campaign.description or '' }}</div>
+        </div>
+      {% endif %}
+      <section id="contrib-panel" aria-live="polite">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <strong>Goal:</strong> <span id="goal">—</span>
+          </div>
+          <div>
+            <strong>Raised:</strong> <span id="raised">—</span>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div class="progress-track" style="background:#eee;border-radius:8px;height:28px;overflow:hidden;">
+            <div id="progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#4caf50,#9be7a9);transition:width 500ms ease;"></div>
+          </div>
+          <div style="margin-top:8px;display:flex;justify-content:space-between;">
+            <small><span id="percent">0%</span> contributed</small>
+            <small>Remaining: <span id="remaining">—</span></small>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <h4>Recent contributions</h4>
+          <ul id="payments-list" style="list-style:none;padding-left:0;margin:0;">
+          </ul>
+        </div>
+
+        <!-- Simulation disabled in UI for production deploys. To test locally, set
+             ENABLE_MPESA_SIMULATE=true and use a client to POST to /contributions/simulate -->
+      </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/contributions.js') }}"></script>
+  </body>
+</html>

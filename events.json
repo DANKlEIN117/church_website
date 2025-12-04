@@ -10,5 +10,11 @@
         "title": "Christmas",
         "date": "2025-12-25",
         "description": "Christmass day for all christians"
+    },
+    {
+        "id": 3,
+        "title": "New year",
+        "date": "2026-01-01",
+        "description": "New Year"
     }
 ]

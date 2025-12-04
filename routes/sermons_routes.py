@@ -33,7 +33,7 @@ def add_sermon():
     if not session.get('admin'):
         flash('Admin access required.')
         session['next'] = 'add_sermon'
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('admin.admin_login'))
 
     if request.method == 'POST':
         title = request.form['title']

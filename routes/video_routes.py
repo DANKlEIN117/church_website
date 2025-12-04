@@ -35,7 +35,7 @@ def video_messages():
 def upload_video():
     if not session.get('admin'):
         flash('Admin access required to upload videos.')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('admin.admin_login'))
 
     if request.method == 'POST':
         file = request.files['video']
@@ -60,7 +60,7 @@ def delete_video(filename):
     if not session.get('admin'):
         session['next_delete_video'] = filename
         flash('Admin access required to delete video.')
-        return redirect(url_for('admin_login'))
+        return redirect(url_for('admin.admin_login'))
 
     try:
         # Reconstruct the Cloudinary public_id

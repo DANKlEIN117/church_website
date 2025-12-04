@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         :root{
-            --primary:#1e3a8a; /* deep blue */
-            --accent:#f59e0b;  /* gold */
-            --muted:#6b7280;
+            --primary:#1e3a8a; 
+            --accent:#f59e0b;  
+            --muted:#320ed4;
             --card:#ffffff;
         }
 
@@ -71,21 +71,21 @@
         .weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:8px 6px;color:var(--muted);font-weight:700}
         .weekdays div{text-align:center}
         .days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:6px}
-        .day-cell{min-height:86px;background:linear-gradient(180deg,#ffffff,#fbfdff);border-radius:8px;padding:8px;position:relative;border:1px solid rgba(2,6,23,0.04);cursor:pointer;display:flex;flex-direction:column}
+        .day-cell{min-height:86px;background:linear-gradient(180deg,#34c011,#c41064);border-radius:8px;padding:8px;position:relative;border:1px solid rgba(2,6,23,0.04);cursor:pointer;display:flex;flex-direction:column}
         .day-cell.muted{opacity:0.45;background:transparent}
         .day-cell .num{font-size:0.95rem;color:var(--muted);font-weight:700}
         .day-cell .dots{margin-top:auto;display:flex;gap:6px}
-        .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block;box-shadow:0 2px 6px rgba(245,158,11,0.18)}
-        .day-cell.today{box-shadow:0 6px 18px rgba(30,64,175,0.12);border:2px solid rgba(30,64,175,0.12)}
-        .day-cell.selected{outline:3px solid rgba(34,77,176,0.12)}
+        .dot{width:9px;height:9px;border-radius:50%;background:rgba(139, 31, 143, 0.493);display:inline-block;box-shadow:0 2px 6px rgba(185, 19, 75, 0.18)}
+        .day-cell.today{box-shadow:0 6px 18px rgba(177, 12, 168, 0.747);border:2px solid rgba(30,64,175,0.12); outline: 3px solid rgba(193, 9, 199, 0.753);}
+        .day-cell.selected{outline:3px solid rgba(247, 18, 18, 0.945)}
 
         /* past vs upcoming visuals */
-        .day-cell.past{background:#fbfbfd;color:#64748b}
-        .day-cell.upcoming{background:linear-gradient(180deg,#ffffff,#fcfff5)}
+        .day-cell.past{background:#9f4fb88f;color:#797bd1bb}
+        .day-cell.upcoming{background:linear-gradient(180deg,#6ceea2a8,#94ee579d)}
         .dot{transition:transform .12s ease}
 
         .event-list{margin-top:12px;padding:12px;border-radius:10px;background:#fbfdff;border:1px solid rgba(2,6,23,0.04)}
-        .event-item{padding:10px;border-bottom:1px dashed rgba(2,6,23,0.04)}
+        .event-item{padding:10px;border-bottom:1px dashed rgba(40, 77, 241, 0.04)}
         .event-item:last-child{border-bottom:none}
         .ev-title{font-weight:700;color:var(--primary)}
         .ev-desc{color:var(--muted);font-size:0.95rem;margin-top:6px}
@@ -158,7 +158,8 @@
         <div class="calendar-header">
             <div class="calendar-title">
                 <h2>📅 Church Calendar</h2>
-                <p id="calendar-sub">Browse scheduled church events — click a date to view details.</p>
+                <p style="color: red; font-weight: bolder;">Rapogi Lwanda Church Calender</p>
+                
             </div>
 
             <div class="calendar-actions">

@@ -1,16 +1,9 @@
 [
     {
         "id": 1,
-        "title": "Second Comming Of Jesus",
+        "title": "Baptism",
         "preacher": "Pastor Michael",
-        "date": "2025-11-08",
-        "summary": "Revelation 23: 1 - 10;"
-    },
-    {
-        "id": 2,
-        "title": "Moses",
-        "preacher": "Pastor Michael",
-        "date": "2025-11-08",
-        "summary": "Crossing The Red Sea"
+        "date": "2025-11-30",
+        "summary": "Baptising new members"
     }
 ]

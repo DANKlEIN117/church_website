@@ -60,6 +60,7 @@
                     <ul class="dropdown-content">
                         <li><a href="{{ url_for('events.events') }}">Upcoming Events</a></li>
                         <li><a href="{{ url_for('calendar') }}">Church Calendar</a></li>
+                        <li><a href="{{ url_for('contributions_page') }}">Contribute</a></li>
                         <li><a href="{{ url_for('gallery.gallery') }}">Church Gallery</a></li>
                     </ul>
                 </li>
@@ -124,6 +125,12 @@
     <section class="hero">
         <h2>“Let your light shine before others.” – Matthew 5:16</h2>
         <p>Welcome to a place of peace, worship, and community.</p>
+                <p style="margin-top:16px;">
+                    {% if session.get('admin') %}
+                        <a href="{{ url_for('admin_contributions') }}" class="btn">🙏 Contribute (Admin)</a>
+
+                    {% endif %}
+                </p>
     </section>
 
     <section class="mission">
