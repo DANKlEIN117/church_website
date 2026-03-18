@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Church Event | Rapogi Lwanda SDA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
+{% block title %}Add Church Event | Rapogi Lwanda SDA{% endblock %}
+
+{% block extra_css %}
+<style>
         body {
             font-family: 'High Tower Text', serif;
             background: linear-gradient(to right, #2d2d7c, #00695c);
@@ -74,11 +71,10 @@
             text-decoration: underline;
         }
     </style>
-</head>
+{% endblock %}
 
-<body>
-
-    <div class="event-container">
+{% block content %}
+<div class="event-container">
         <h2>➕ Add Church Event</h2>
 
         <form method="POST">
@@ -90,7 +86,4 @@
 
         <a href="{{ url_for('events.events') }}">🔙 Back to Events</a>
     </div>
-
-</body>
-
-</html>
+{% endblock %}

@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login | Rapogi Lwanda SDA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
+{% block title %}Admin Login | Rapogi Lwanda SDA{% endblock %}
+
+{% block extra_css %}
+<style>
         body {
             font-family: 'High Tower Text', sans-serif;
             background: linear-gradient(to right, #2d2d7c, #00695c);
@@ -81,11 +78,10 @@
             text-decoration: underline;
         }
     </style>
-</head>
+{% endblock %}
 
-<body>
-
-    <div class="login-container">
+{% block content %}
+<div class="login-container">
         <h2>🔐 Admin Login</h2>
 
         <form method="POST">
@@ -97,7 +93,4 @@
 
         <a href="{{ url_for('home') }}" class="back-home">🏠 Back to Home</a>
     </div>
-
-</body>
-
-</html>
+{% endblock %}

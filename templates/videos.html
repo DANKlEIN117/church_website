@@ -1,17 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📺 Church Video Messages</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
+{% block title %}📺 Church Video Messages{% endblock %}
+
+{% block extra_css %}
+<style>
         body {
             background-color: #091e3e;
             color: white;
             font-family: 'High Tower Text', sans-serif;
-            padding: 40px 20px;
         }
 
         h2 {
@@ -89,21 +85,19 @@
             display: inline-block;
         }
     </style>
-</head>
+{% endblock %}
 
-<body>
-
-    <h2>🎥 Rapogi Lwanda Church Video Messages</h2>
+{% block content %}
+<h2>🎥 Rapogi Lwanda Church Video Messages</h2>
 
     <div class="top-buttons">
         {% if session.get('admin') %}
             <!-- FIXED: prefixed with blueprint name -->
             <a href="{{ url_for('video.upload_video') }}" class="btn">📤 Upload New Video</a>
-            <a href="{{ url_for('home') }}" class="btn">🏠 Back to Home</a>
             <a href="https://www.youtube.com/@rapogilwandasdachurchchoir2301" class="btn">📺 Explore on YouTube</a>
         {% else %}
             <!-- FIXED: home route is defined in main app -->
-            <a href="{{ url_for('home') }}" class="btn">🏠 Back to Home</a>
+            
             <a href="https://www.youtube.com/@rapogilwandasdachurchchoir2301" class="btn">📺 Explore on YouTube</a>
         {% endif %}
     </div>
@@ -166,7 +160,4 @@
             });
         })();
     </script>
-
-</body>
-
-</html>
+{% endblock %}

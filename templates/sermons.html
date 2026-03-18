@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Latest Sermons | Rapogi Lwanda SDA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
+{% block title %}Latest Sermons | Rapogi Lwanda SDA{% endblock %}
+
+{% block extra_css %}
+<style>
         body {
             font-family: 'Times New Roman', serif;
             background-color: #38155544;
-            padding: 40px 20px;
             color: #333;
         }
 
@@ -74,11 +71,10 @@
             text-decoration: none;
         }
     </style>
-</head>
+{% endblock %}
 
-<body>
-
-    <h2>🕊 Latest Church Sermons</h2>
+{% block content %}
+<h2>🕊 Latest Church Sermons</h2>
 
     <div class="sermon-list">
         {% for sermon in sermons %}
@@ -104,7 +100,4 @@
         {% endif %}
         <a href="{{ url_for('home') }}">🏠 Back to Home</a>
     </div>
-
-</body>
-
-</html>
+{% endblock %}

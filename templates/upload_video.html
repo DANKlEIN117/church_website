@@ -1,21 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Video | Rapogi Lwanda SDA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
+{% block title %}Upload Video | Rapogi Lwanda SDA{% endblock %}
+
+{% block extra_css %}
+<style>
         body {
             font-family: 'High Tower Text', sans-serif;
             background: linear-gradient(to right, #2d2d7c, #00695c);
             color: #4110b4;
+            margin: 0;
+        }
+
+        .upload-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            min-height: calc(100vh - 200px); /* Adjust for header/footer height */
+            padding: 20px;
         }
 
         .upload-container {
@@ -69,30 +70,110 @@
         .back-link:hover {
             text-decoration: underline;
         }
+
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #00bfa5;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .success-message {
+            margin-top: 20px;
+            color: #4CAF50;
+            font-weight: bold;
+            display: none;
+        }
     </style>
-</head>
+{% endblock %}
 
-<body>
-
+{% block content %}
+<div class="upload-wrapper">
     <div class="upload-container">
         <h2>📤 Upload New Video Message</h2>
 
         <!-- FIXED: added proper action with blueprint -->
-        <form action="{{ url_for('video.upload_video') }}" method="POST" enctype="multipart/form-data">
+        <form id="upload-form" action="{{ url_for('video.upload_video') }}" method="POST" enctype="multipart/form-data">
             <input type="file" name="video" accept="video/mp4" required><br>
             <button type="submit">Upload Video</button>
         </form>
 
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <p id="progress-text">Uploading... 0%</p>
+        </div>
+
+        <div class="success-message" id="success-message">
+            ✅ Video uploaded successfully!
+        </div>
+
         <!-- FIXED: correct blueprint reference -->
         <a href="{{ url_for('video.video_messages') }}" class="back-link">🏠 Back to videos</a>
     </div>
+</div>
+
+<script>
+document.getElementById('upload-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const xhr = new XMLHttpRequest();
+    
+    // Show progress bar
+    document.querySelector('.progress-container').style.display = 'block';
+    document.querySelector('button[type="submit"]').disabled = true;
+    
+    xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+            const percentComplete = (e.loaded / e.total) * 100;
+            document.getElementById('progress-fill').style.width = percentComplete + '%';
+            document.getElementById('progress-text').textContent = 'Uploading... ' + Math.round(percentComplete) + '%';
+        }
+    };
+    
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            document.querySelector('.progress-container').style.display = 'none';
+            document.getElementById('success-message').style.display = 'block';
+            document.querySelector('button[type="submit"]').disabled = false;
+            form.reset();
+        } else {
+            alert('Upload failed. Please try again.');
+            document.querySelector('.progress-container').style.display = 'none';
+            document.querySelector('button[type="submit"]').disabled = false;
+        }
+    };
+    
+    xhr.onerror = function() {
+        alert('Upload failed. Please try again.');
+        document.querySelector('.progress-container').style.display = 'none';
+        document.querySelector('button[type="submit"]').disabled = false;
+    };
+    
+    xhr.open('POST', form.action);
+    xhr.send(formData);
+});
+</script>
 
     {% if session.get('admin') %}
         <p>You are logged in as admin</p>
     {% else %}
         <a href="{{ url_for('admin.admin_login') }}">🔐 Admin Login</a>
     {% endif %}
-
-</body>
-
-</html>
+{% endblock %}

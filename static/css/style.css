@@ -5,6 +5,7 @@ body {
     margin: 0;
     font-family: 'Times New Roman', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
+    background-color: #2d2d7c;
 }
 
 header {
@@ -30,9 +31,11 @@ nav a {
     background-image: url('../images/image.png');
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
     color: white;
     padding: 280px 20px;
     text-align: center;
+    border-radius: 10px;
 }
 
 .mission {
@@ -46,6 +49,7 @@ footer {
     color: rgb(32, 139, 131);
     text-align: center;
     padding: 2px;
+    border-radius: 10px;
 }
 .db{
     background-color: #dbcbdb;

@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Songs | Rapogi Lwanda SDA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
+{% block title %}Upload Songs | Rapogi Lwanda SDA{% endblock %}
+
+{% block extra_css %}
+<style>
         body {
             font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(to right, #004d40, #00695c);
@@ -72,21 +69,59 @@
             border-radius: 12px;
             margin-top: 30px;
         }
+
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #00bfa5;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .success-message {
+            margin-top: 20px;
+            color: #4CAF50;
+            font-weight: bold;
+            display: none;
+        }
     </style>
-</head>
+{% endblock %}
 
-<body>
-
-    <div class="upload-container">
+{% block content %}
+<div class="upload-container">
         <h2>🎶 Upload a New Album to the Church Audio Library</h2>
 
         {% if session.get('admin') %}
         <!-- FIXED: added proper blueprint name -->
-        <form action="{{ url_for('audio.upload_album') }}" method="post" enctype="multipart/form-data">
+        <form id="upload-form" action="{{ url_for('audio.upload_album') }}" method="post" enctype="multipart/form-data">
             <input type="text" name="album_name" placeholder="Enter Album Name" required><br>
             <input type="file" name="songs" accept=".mp3" multiple required><br>
             <input type="submit" value="Upload Album">
         </form>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <p id="progress-text">Uploading... 0%</p>
+        </div>
+
+        <div class="success-message" id="success-message">
+            ✅ Album uploaded successfully!
+        </div>
+
         <p>You are logged in as admin ✅</p>
 
         {% else %}
@@ -102,6 +137,47 @@
         <a href="{{ url_for('audio.audio') }}" class="back-link">🎧 View Audio Library</a>
     </div>
 
-</body>
-
-</html>
+<script>
+document.getElementById('upload-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const xhr = new XMLHttpRequest();
+    
+    // Show progress bar
+    document.querySelector('.progress-container').style.display = 'block';
+    document.querySelector('input[type="submit"]').disabled = true;
+    
+    xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+            const percentComplete = (e.loaded / e.total) * 100;
+            document.getElementById('progress-fill').style.width = percentComplete + '%';
+            document.getElementById('progress-text').textContent = 'Uploading... ' + Math.round(percentComplete) + '%';
+        }
+    };
+    
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            document.querySelector('.progress-container').style.display = 'none';
+            document.getElementById('success-message').style.display = 'block';
+            document.querySelector('input[type="submit"]').disabled = false;
+            form.reset();
+        } else {
+            alert('Upload failed. Please try again.');
+            document.querySelector('.progress-container').style.display = 'none';
+            document.querySelector('input[type="submit"]').disabled = false;
+        }
+    };
+    
+    xhr.onerror = function() {
+        alert('Upload failed. Please try again.');
+        document.querySelector('.progress-container').style.display = 'none';
+        document.querySelector('input[type="submit"]').disabled = false;
+    };
+    
+    xhr.open('POST', form.action);
+    xhr.send(formData);
+});
+</script>
+{% endblock %}

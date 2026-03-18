@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Church Gallery | Rapogi Lwanda SDA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
+{% extends "base.html" %}
+
+{% block title %}Church Gallery | Rapogi Lwanda SDA{% endblock %}
+
+{% block extra_css %}
+<style>
         body {
             font-family: 'High Tower Text', sans-serif;
             background: #9b7a85;
-            padding: 20px;
             text-align: center;
         }
 
@@ -119,10 +116,10 @@
             background-color: #00bfa5;
         }
     </style>
-</head>
-<body>
+{% endblock %}
 
-    <h2>📸 Rapogi Lwanda Church Gallery</h2>
+{% block content %}
+<h2>📸 Rapogi Lwanda Church Gallery</h2>
 
     <div class="gallery-grid">
         {% for image in images %}
@@ -158,7 +155,4 @@
     {% else %}
         <a href="{{ url_for('admin.admin_login') }}">🔐 Admin Login</a>
     {% endif %}
-
-
-</body>
-</html>
+{% endblock %}

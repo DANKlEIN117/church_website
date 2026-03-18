@@ -1,13 +1,9 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Contributions — Rapogi Lwanda SDA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  </head>
-  <body>
-    <h2>Contributions</h2>
+{% extends "base.html" %}
+
+{% block title %}Contributions — Rapogi Lwanda SDA{% endblock %}
+
+{% block content %}
+<h2>Contributions</h2>
 
     <main style="max-width:900px;margin:20px auto;padding:10px;">
       {% if active_campaign %}
@@ -48,5 +44,4 @@
     </main>
 
     <script src="{{ url_for('static', filename='js/contributions.js') }}"></script>
-  </body>
-</html>
+{% endblock %}

@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📅 Church Calendar 2025 | Rapogi Lwanda SDA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
+{% block title %}📅 Church Calendar 2025 | Rapogi Lwanda SDA{% endblock %}
+
+{% block extra_css %}
+<style>
         :root{
             --primary:#1e3a8a; 
             --accent:#f59e0b;  
@@ -150,11 +147,10 @@
             .pdf-frame{height:60vh}
         }
     </style>
-</head>
+{% endblock %}
 
-<body>
-
-    <div class="calendar-wrap">
+{% block content %}
+<div class="calendar-wrap">
         <div class="calendar-header">
             <div class="calendar-title">
                 <h2>📅 Church Calendar</h2>
@@ -345,9 +341,4 @@
     {% else %}
         <a href="{{ url_for('admin.admin_login') }}">🔐 Admin Login</a>
     {% endif %}
-
-
-
-</body>
-
-</html>
+{% endblock %}

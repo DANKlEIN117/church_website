@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RAPOGI LWANDA SDA CHURCH{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="google-site-verification" content="ejyl8phtGqzQGgRFI-mISI6tAkYYoQ-YNaWshQsraPE" />
+    <style>
+        /* Notification bell dropdown */
+        .nav-notify { position: relative; }
+        .bell-btn { background: transparent; border: none; font-size: 1.0rem; cursor: pointer; display:flex; align-items:center; gap:6px; }
+        .bell-badge { background:#ff3b30; color:rgb(53, 49, 49); padding:2px 6px; border-radius:999px; font-size:0.75rem; font-weight:700; margin-left:6px; }
+        .notify-dropdown { position: absolute; right: 0; top: 36px; width: 320px; max-width: calc(100vw - 32px); background: white; border-radius:8px; box-shadow: 0 8px 32px rgba(15,23,42,0.12); border:1px solid rgba(2,6,23,0.06); z-index:1200; }
+        .notify-header{padding:10px 14px;border-bottom:1px solid rgba(2,6,23,0.04);font-weight:700;color:#0f172a}
+        .notify-body{max-height:280px;overflow:auto;padding:8px 12px}
+        .notify-section{margin-bottom:8px}
+        .notify-section ul{margin:6px 0 0 14px;padding:0;color:#374151}
+        .notify-footer{padding:8px 8px;border-top:1px solid rgba(2,6,23,0.04);text-align:right; background-color: #374151;}
+        .notify-item.upcoming{background:linear-gradient(90deg,#cf8a35,#3816ce);padding:8px;border-radius:6px;margin-bottom:6px}
+        .notify-item.past{opacity:0.7;padding:8px;border-radius:6px;margin-bottom:6px}
+        @media (max-width:520px){ .notify-dropdown{right:6px;left:6px;top:42px;width:auto} }
+
+        /* Full width header and footer to override body padding */
+        header {
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            box-sizing: border-box;
+        }
+        footer {
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            box-sizing: border-box;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="Left Logo" class="logo">
+            <h1>SEVENTH DAY ADVENTIST CHURCH, RAPOGI LWANDA</h1>
+            <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="Right Logo" class="logo">
+        </div>
+        
+        <nav class="navbar">
+            <div class="hamburger" onclick="toggleMenu()">☰</div>
+            <ul class="nav-menu">
+                <li><a href="/">Home</a></li>
+                
+
+                <li class="dropdown">
+                    <a href="#about">About Us</a>
+                    <ul class="dropdown-content">
+                        <li><a href="#">Who We Are</a></li>
+                        <li><a href="#">Our Mission</a></li>
+                        <li><a href="#">Pastor's Message</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#sermons">Sermons</a>
+                    <ul class="dropdown-content">
+                        <li><a href="{{ url_for('sermons.sermons') }}">Latest Sermons</a></li>
+                        <li><a href="{{ url_for('audio.audio') }}">Audio Library</a></li>
+                        <li><a href="{{ url_for('video.video_messages') }}">Video Messages</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#events">Events</a>
+                    <ul class="dropdown-content">
+                        <li><a href="{{ url_for('events.events') }}">Upcoming Events</a></li>
+                        <li><a href="{{ url_for('calendar') }}">Church Calendar</a></li>
+                        <li><a href="{{ url_for('contributions_page') }}">Contribute</a></li>
+                        <li><a href="{{ url_for('gallery.gallery') }}">Church Gallery</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#members">Members</a>
+                    <ul class="dropdown-content">
+                        <li><a href="#">Church Choir</a></li>
+                        <li><a href="#">Youth Choir</a></li>
+                        <li><a href="#">Children's Choir</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#leaders">Church Leaders</a>
+                    <ul class="dropdown-content">
+                        <li><a href="#">Pastor</a></li>
+                        <li><a href="#">Elders</a></li>
+                        <li><a href="#">Deacons</a></li>
+                        <li><a href="#">Deaconesses</a></li>
+                        <li><a href="#">Others</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="#contact">Contact</a></li>
+                <li class="nav-notify">
+                    <div class="notify-wrapper">
+                        <button id="bellBtn" class="bell-btn" aria-haspopup="true" aria-expanded="false" title="Notifications">🔔
+                            {% if events_summary and events_summary.upcoming_count %}
+                                <span class="bell-badge">{{ events_summary.upcoming_count }}</span>
+                            {% endif %}
+                        </button>
+
+                        <div id="bellDropdown" class="notify-dropdown" hidden aria-hidden="true">
+                            <div class="notify-header">Notifications</div>
+                            <div class="notify-body">
+                                <div class="notify-section">
+                                    <strong>Upcoming</strong>
+                                    <div id="notify-upcoming">
+                                        <div class="notify-loading">Loading…</div>
+                                    </div>
+                                </div>
+                                <div class="notify-section">
+                                    <strong>Recent past</strong>
+                                    <div id="notify-past">
+                                        <div class="notify-loading">Loading…</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="notify-footer"><a href="{{ url_for('calendar') }}">View full calendar ▸</a></div>
+                        </div>
+                    </div>
+                </li>
+
+                {% if session.get('admin') %}
+                    <li><a href="{{ url_for('admin.logout') }}">🚪 Logout</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main style="padding: 40px 20px;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="db">
+        <p>&copy; 2025 Rapogi Lwanda SDA Church | All Rights Reserved</p>
+        {% if session.get('admin') %}
+        <p>You are logged in as admin</p>
+        {% else %}
+            <a href="{{ url_for('admin.admin_login') }}" class="btn">🔐 Admin Login</a>
+        {% endif %}
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            const navMenu = document.querySelector('.nav-menu');
+            navMenu.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

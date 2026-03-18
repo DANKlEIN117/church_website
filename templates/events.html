@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Church Events | Rapogi Lwanda SDA</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-        <style>
+{% block title %}Church Events | Rapogi Lwanda SDA{% endblock %}
+
+{% block extra_css %}
+<style>
             body {
                 font-family: 'Times New Roman', serif;
                 background-color: #38155544;
-                padding: 40px 20px;
                 color: #333;
             }
 
@@ -98,11 +94,10 @@
                 margin-top: 15px;
             }
         </style>
-    </head>
+{% endblock %}
 
-    <body>
-
-        <h2>📅 Rapogi Lwanda Upcoming Church Events</h2>
+{% block content %}
+<h2>📅 Rapogi Lwanda Upcoming Church Events</h2>
 
         <div class="event-list">
             {% for event in events %}
@@ -135,7 +130,4 @@
         {% if session.get('admin') %}
         <p class="admin-msg">You are logged in as admin</p>
         {% endif %}
-
-    </body>
-
-</html>
+{% endblock %}

@@ -1,11 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Photo | Rapogi Gallery</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
+{% extends "base.html" %}
+
+{% block title %}Upload Photo | Rapogi Gallery{% endblock %}
+
+{% block extra_css %}
+<style>
         body {
             font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(to right, #00695c, #004d40);
@@ -64,10 +62,10 @@
             color: #80cbc4;
         }
     </style>
-</head>
-<body>
+{% endblock %}
 
-    <div class="upload-box">
+{% block content %}
+<div class="upload-box">
         <h2>📤 Upload New Church Photo</h2>
 
         <!-- FIXED url_for calls -->
@@ -85,6 +83,4 @@
     {% else %}
         <a href="{{ url_for('admin.admin_login') }}">🔐 Admin Login</a>
     {% endif %}
-
-</body>
-</html>
+{% endblock %}

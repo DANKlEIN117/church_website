@@ -1,16 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎵 Audio Library | Rapogi Lwanda SDA</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <style>
+{% extends "base.html" %}
+
+{% block title %}🎵 Audio Library | Rapogi Lwanda SDA{% endblock %}
+
+{% block extra_css %}
+<style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #f0f4f8;
       margin: 0;
-      padding: 20px;
     }
 
     h2 {
@@ -123,10 +120,10 @@
     }
 
   </style>
-</head>
-<body>
+{% endblock %}
 
-  <h2>📀 Rapogi Lwanda SDA Church Albums</h2>
+{% block content %}
+<h2>📀 Rapogi Lwanda SDA Church Albums</h2>
 
   {% if albums %}
     {% for album, songs in albums.items() %}
@@ -200,6 +197,4 @@
       });
     })();
   </script>
-
-</body>
-</html>
+{% endblock %}
