@@ -125,6 +125,17 @@
 {% block content %}
 <h2>📀 Rapogi Lwanda SDA Church Albums</h2>
 
+  {% if session.get('admin') %}
+    <div class="upload-link">
+      <a href="{{ url_for('audio.upload_album') }}">➕ Upload New Album</a>
+      <a href="{{ url_for('home') }}">🏠 Back to Home</a>
+    </div>
+  {% else %}
+    <div class="upload-link">
+      <a href="{{ url_for('home') }}">🏠 Back to Home</a>
+    </div>
+  {% endif %}
+
   {% if albums %}
     {% for album, songs in albums.items() %}
       <div class="album">
@@ -149,16 +160,7 @@
     <p style="text-align: center; color: #888;">No albums available yet.</p>
   {% endif %}
 
-  {% if session.get('admin') %}
-    <div class="upload-link">
-      <a href="{{ url_for('audio.upload_album') }}">➕ Upload New Album</a>
-      <a href="{{ url_for('home') }}">🏠 Back to Home</a>
-    </div>
-  {% else %}
-    <div class="upload-link">
-      <a href="{{ url_for('home') }}">🏠 Back to Home</a>
-    </div>
-  {% endif %}
+  
 
   <script>
     // When one audio starts playing, pause all other audio elements

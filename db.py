@@ -60,6 +60,16 @@ def init_db():
         cols = [r[1] for r in cur.fetchall()]
         if 'campaign_id' not in cols:
             cur.execute('ALTER TABLE contributions ADD COLUMN campaign_id TEXT')
+        if 'status' not in cols:
+            cur.execute("ALTER TABLE contributions ADD COLUMN status TEXT DEFAULT 'completed'")
+        if 'checkout_request_id' not in cols:
+            cur.execute('ALTER TABLE contributions ADD COLUMN checkout_request_id TEXT')
+        if 'daraja_response' not in cols:
+            cur.execute('ALTER TABLE contributions ADD COLUMN daraja_response TEXT')
+        if 'trans_id' not in cols:
+            cur.execute('ALTER TABLE contributions ADD COLUMN trans_id TEXT')
+        if 'category' not in cols:
+            cur.execute('ALTER TABLE contributions ADD COLUMN category TEXT DEFAULT "general"')
     except Exception:
         pass
 
@@ -84,9 +94,37 @@ def init_app(app):
 
 def add_payment(entry):
     db = get_db()
-    db.execute('INSERT INTO contributions(id, from_name, amount, timestamp, method, campaign_id) VALUES (?, ?, ?, ?, ?, ?)',
-               (entry['id'], entry.get('from'), entry.get('amount'), entry.get('timestamp'), entry.get('method'), entry.get('campaign_id')))
+    db.execute('INSERT INTO contributions(id, from_name, amount, timestamp, method, campaign_id, status, checkout_request_id, daraja_response, trans_id, category) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+               (entry['id'], entry.get('from'), entry.get('amount'), entry.get('timestamp'), entry.get('method'), entry.get('campaign_id'), entry.get('status', 'completed'), entry.get('checkout_request_id'), entry.get('daraja_response'), entry.get('trans_id'), entry.get('category', 'general')))
     db.commit()
+
+
+def update_payment_status(payment_id, status, checkout_request_id=None, daraja_response=None):
+    db = get_db()
+    query = 'UPDATE contributions SET status = ?'
+    params = [status]
+    if checkout_request_id is not None:
+        query += ', checkout_request_id = ?'
+        params.append(checkout_request_id)
+    if daraja_response is not None:
+        query += ', daraja_response = ?'
+        params.append(daraja_response)
+    query += ' WHERE id = ?'
+    params.append(payment_id)
+    db.execute(query, tuple(params))
+    db.commit()
+
+
+def get_payment_by_checkout_request_id(checkout_request_id):
+    db = get_db()
+    row = db.execute('SELECT * FROM contributions WHERE checkout_request_id = ?', (checkout_request_id,)).fetchone()
+    return dict(row) if row else None
+
+
+def get_payment_by_trans_id(trans_id):
+    db = get_db()
+    row = db.execute('SELECT * FROM contributions WHERE trans_id = ?', (trans_id,)).fetchone()
+    return dict(row) if row else None
 
 
 def create_campaign(entry):
@@ -260,15 +298,19 @@ def get_active_campaign():
         try:
             ccur = db.execute('SELECT id, title, description, target_amount, created_at, status FROM campaigns WHERE id = ?', (cid,))
             crow = ccur.fetchone()
-            return dict(crow) if crow else None
+            if crow:
+                if crow['status'] == 'active':
+                    return dict(crow)
+                # if saved active_campaign_id points to non-active, ignore and fallback
+            # fallthrough to fallback
         except sqlite3.OperationalError:
             ccur = db.execute('SELECT id, title, description, target_amount, created_at, active FROM campaigns WHERE id = ?', (cid,))
             crow = ccur.fetchone()
-            if not crow:
-                return None
-            d = dict(crow)
-            d['status'] = 'active' if d.get('active') else 'inactive'
-            return d
+            if crow and crow['active'] == 1:
+                d = dict(crow)
+                d['status'] = 'active'
+                return d
+            # fallthrough to fallback
     # fallback: find first active
     try:
         ccur = db.execute("SELECT id, title, description, target_amount, created_at, status FROM campaigns WHERE status = 'active' LIMIT 1")
@@ -286,7 +328,7 @@ def get_active_campaign():
 
 def get_payments(limit=100):
     db = get_db()
-    cur = db.execute('SELECT id, from_name, amount, timestamp, method, campaign_id FROM contributions ORDER BY timestamp DESC LIMIT ?', (limit,))
+    cur = db.execute('SELECT id, from_name, amount, timestamp, method, campaign_id, status, trans_id, category FROM contributions ORDER BY timestamp DESC LIMIT ?', (limit,))
     rows = cur.fetchall()
     return [dict(r) for r in rows]
 

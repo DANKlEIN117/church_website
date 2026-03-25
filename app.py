@@ -14,8 +14,22 @@ import base64
 import logging
 import io
 import csv
+import urllib.request
+import urllib.parse
+
+# MPESA / Daraja C2B config placeholders (fill from your Daraja dashboard)
+MPESA_ENV = os.getenv('MPESA_ENV', 'sandbox')  # sandbox | production
+MPESA_CONSUMER_KEY = os.getenv('MPESA_CONSUMER_KEY')  # put your consumer key here
+MPESA_CONSUMER_SECRET = os.getenv('MPESA_CONSUMER_SECRET')  # put your consumer secret here
+MPESA_SHORTCODE = os.getenv('MPESA_SHORTCODE')  # e.g. PayBill number
+MPESA_C2B_VALIDATION_URL = os.getenv('MPESA_C2B_VALIDATION_URL', os.getenv('BASE_URL', 'https://yourdomain.com') + '/contributions/webhook')
+MPESA_C2B_CONFIRMATION_URL = os.getenv('MPESA_C2B_CONFIRMATION_URL', os.getenv('BASE_URL', 'https://yourdomain.com') + '/contributions/webhook')
+MPESA_WEBHOOK_SECRET = os.getenv('MPESA_WEBHOOK_SECRET')  # webhook hmac secret
+
+MPESA_BASE_URL = 'https://sandbox.safaricom.co.ke' if MPESA_ENV == 'sandbox' else 'https://api.safaricom.co.ke'
 from db import init_app as db_init_app, init_db, add_payment, get_payments, get_summary, set_target_amount
 from db import create_campaign, get_campaigns, set_active_campaign, get_active_campaign, get_campaign, get_audits
+from db import update_payment_status, get_payment_by_checkout_request_id
 
 # Load environment variables
 load_dotenv()
@@ -131,6 +145,11 @@ def contributions_data():
         })
 
 
+def get_mpesa_oauth_token():
+    # For C2B, we may need token for other APIs, but not for payment initiation
+    pass
+
+
 @app.route('/contributions/simulate', methods=['POST'])
 def contributions_simulate():
     """Simulate receiving a contribution (for testing). Expects JSON {name, amount}.
@@ -170,9 +189,9 @@ def contributions_simulate():
 
 @app.route('/contributions/webhook', methods=['POST'])
 def contributions_webhook():
-    """Endpoint to receive real Mpesa callbacks/webhooks (STK push or confirmation).
-    For real integration, validate signatures and secrets. Here we accept JSON payloads
-    and attempt to append an entry if it contains an `amount` and `msisdn`/`name`.
+    """Endpoint to receive C2B validation and confirmation callbacks from Mpesa.
+    For validation, return success to allow transaction.
+    For confirmation, process the payment.
     """
     # Verify webhook signature if configured
     secret = os.getenv('MPESA_WEBHOOK_SECRET')
@@ -199,106 +218,99 @@ def contributions_webhook():
         # If no secret configured, allow but warn in logs
         current_app.logger.warning('MPESA_WEBHOOK_SECRET not set — accepting webhook without verification')
 
-    # parse payload and attempt to extract amount and sender
+    # parse payload
     try:
         payload = request.get_json(force=True) or {}
     except Exception:
         payload = {}
 
-    # log raw request body for audit (already verified if secret set)
+    # log raw request body for audit
     try:
         wh_logger.info(request.get_data(as_text=True))
     except Exception:
         current_app.logger.exception('failed to write webhook log')
 
-    amount = None
-    name = None
+    # Extract C2B fields
+    trans_id = payload.get('TransID')
+    amount = payload.get('TransAmount')
+    msisdn = payload.get('MSISDN')
+    first_name = payload.get('FirstName', '')
+    middle_name = payload.get('MiddleName', '')
+    last_name = payload.get('LastName', '')
+    bill_ref = payload.get('BillRefNumber', '').strip().upper()
 
-    # Daraja typical structure: { "Body": { "stkCallback": { "CallbackMetadata": { "Item": [...] } } } }
-    # Try common locations for amount and phone/account
-    def extract_from_items(items):
-        a = None
-        n = None
-        if not isinstance(items, list):
-            return a, n
-        for it in items:
-            if not isinstance(it, dict):
-                continue
-            key = it.get('Name') or it.get('name')
-            val = it.get('Value') if 'Value' in it else it.get('value')
-            if key and val is not None:
-                k = key.lower()
-                if 'amount' in k and a is None:
-                    try:
-                        a = float(val)
-                    except Exception:
-                        pass
-                if ('msisdn' in k or 'phone' in k or 'number' in k or 'account' in k) and n is None:
-                    n = str(val)
-        return a, n
+    # Map BillRefNumber to category
+    categories = {
+        'TITHE': 'tithe',
+        'OFFERING': 'offering',
+        'OFFERINGS': 'offering',
+        'BUILDING': 'building_fund',
+        'MISSIONS': 'missions',
+        'YOUTH': 'youth_ministry',
+        'CHILDREN': 'children_ministry',
+        'WELFARE': 'welfare',
+        'SPECIAL': 'special_offering',
+        'THANKSGIVING': 'thanksgiving',
+        'SEED': 'seed_offering',
+        'FIRSTFRUIT': 'first_fruit',
+        'TITHE': 'tithe',
+        'TITHES': 'tithe',
+        # Add more mappings as needed
+    }
+    category = categories.get(bill_ref, 'general')
 
-    # drill for callback metadata
-    if isinstance(payload, dict):
-        # search for CallbackMetadata items
-        def find_items(obj):
-            if isinstance(obj, dict):
-                for k, v in obj.items():
-                    if k and 'CallbackMetadata' in k:
-                        items = v.get('Item') if isinstance(v, dict) else None
-                        if items:
-                            return items
-                    res = find_items(v)
-                    if res:
-                        return res
-            elif isinstance(obj, list):
-                for v in obj:
-                    res = find_items(v)
-                    if res:
-                        return res
-            return None
-
-        items = find_items(payload)
-        if items:
-            a, n = extract_from_items(items)
-            amount = amount or a
-            name = name or n
-
-    # fallback simple fields
-    amount = amount or payload.get('amount') or payload.get('Amount')
-    name = name or payload.get('msisdn') or payload.get('phone') or payload.get('name') or 'Mpesa'
+    if not trans_id or not amount or not msisdn:
+        return jsonify({'error': 'missing required C2B fields'}), 400
 
     try:
-        amount = float(amount) if amount is not None else None
+        amount = float(amount)
     except Exception:
-        amount = None
+        return jsonify({'error': 'invalid amount'}), 400
 
-    if amount is None:
-        return jsonify({'error': 'no amount found in payload'}), 400
+    # Check if already processed (idempotency)
+    from db import get_payment_by_trans_id
+    if get_payment_by_trans_id(trans_id):
+        # Already processed, return success
+        return jsonify({'ResultCode': 0, 'ResultDesc': 'Already processed'})
+
+    # Build name from fields
+    name_parts = [first_name, middle_name, last_name]
+    name = ' '.join(p for p in name_parts if p).strip() or msisdn
+
+    # Associate with active campaign only for certain categories
+    # Tithes and offerings are regular giving, not campaign-specific
+    campaign_categories = ['building_fund', 'missions', 'youth_ministry', 'children_ministry', 'welfare', 'special_offering']
+    campaign_id = None
+    if category in campaign_categories:
+        try:
+            active = get_active_campaign()
+            if active and active.get('id'):
+                campaign_id = active.get('id')
+        except Exception:
+            pass
 
     entry = {
         'id': str(uuid.uuid4()),
         'from': name,
         'amount': amount,
         'timestamp': datetime.utcnow().isoformat() + 'Z',
-        'method': 'mpesa',
-        'campaign_id': None
+        'method': 'mpesa-c2b',
+        'campaign_id': campaign_id,
+        'status': 'completed',
+        'trans_id': trans_id,
+        'daraja_response': json.dumps(payload),
+        'category': category
     }
 
-    # associate with active campaign (if any)
-    try:
-        active = get_active_campaign()
-        if active and active.get('id'):
-            entry['campaign_id'] = active.get('id')
-    except Exception:
-        entry['campaign_id'] = None
-
-    # insert into DB
+    # Insert payment
     try:
         add_payment(entry)
     except Exception as e:
-        current_app.logger.exception('db insert failed')
-        return jsonify({'error': 'failed to write to DB', 'details': str(e)}), 500
-    return jsonify({'status': 'ok'})
+        current_app.logger.exception('C2B payment insert failed')
+        return jsonify({'error': 'database error'}), 500
+
+    # Return success for validation/confirmation
+    return jsonify({'ResultCode': 0, 'ResultDesc': 'Accepted'})
 
 
 # Admin: view contributions
@@ -384,6 +396,8 @@ def activate_campaign(campaign_id):
         set_active_campaign(campaign_id)
     except Exception:
         current_app.logger.exception('failed to activate')
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'status': 'ok', 'action': 'activate'})
     return redirect(url_for('admin_contributions'))
 
 
@@ -399,6 +413,8 @@ def update_campaign_status(campaign_id):
         set_campaign_status(campaign_id, new_status)
     except Exception:
         current_app.logger.exception('failed to set campaign status')
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'status': 'ok', 'action': 'status', 'new_status': new_status})
     return redirect(url_for('admin_contributions'))
 
 

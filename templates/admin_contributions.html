@@ -2,6 +2,71 @@
 
 {% block title %}Admin — Contributions{% endblock %}
 
+{% block extra_css %}
+<style>
+body {
+    background-color: #f5f5f5 !important;
+    color: #333 !important;
+}
+main {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+h2, h3 {
+    color: #2d2d7c;
+    border-bottom: 2px solid #2d2d7c;
+    padding-bottom: 8px;
+}
+table {
+    background-color: white;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+th {
+    background-color: #2d2d7c;
+    color: white;
+}
+td {
+    color: #333;
+}
+.btn {
+    background-color: #2d2d7c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn:hover {
+    background-color: #00695c;
+}
+form {
+    background-color: #f9f9f9;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+input[type="text"], input[type="number"] {
+    border: 1px solid #ddd;
+    padding: 6px;
+    border-radius: 4px;
+}
+.success-message {
+    background-color: #e6ffed;
+    color: #155724;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    border: 1px solid #b7f0c6;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <h2>Contributions (Admin)</h2>
     <main style="max-width:1100px;margin:18px auto;padding:8px;">
@@ -34,6 +99,7 @@
             <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd">When</th>
             <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd">From</th>
             <th style="text-align:right;padding:8px;border-bottom:1px solid #ddd">Amount</th>
+            <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd">Category</th>
             <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd">Method</th>
           </tr>
         </thead>
@@ -43,10 +109,11 @@
             <td style="padding:8px;border-bottom:1px solid #f1f1f1">{{ p.timestamp }}</td>
             <td style="padding:8px;border-bottom:1px solid #f1f1f1">{{ p.from_name }}</td>
             <td style="padding:8px;border-bottom:1px solid #f1f1f1;text-align:right">{{ p.amount }}</td>
+            <td style="padding:8px;border-bottom:1px solid #f1f1f1">{{ p.category | title }}</td>
             <td style="padding:8px;border-bottom:1px solid #f1f1f1">{{ p.method }}</td>
           </tr>
           {% else %}
-          <tr><td colspan="4" style="padding:12px">No contributions yet.</td></tr>
+          <tr><td colspan="5" style="padding:12px">No contributions yet.</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -65,21 +132,24 @@
             {% for c in campaigns %}
               <li style="padding:8px;border:1px solid #eee;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
                 <div>
-                  <strong>{{ c.title }}</strong> — Ksh {{ c.target_amount }} {% if c.status == 'active' %}<em>(active)</em>{% endif %}
+                  <strong>{{ c.title }}</strong> — Ksh {{ c.target_amount }}
+                  <span class="campaign-status" style="font-style:italic;color:#00695c;margin-left:8px;">
+                    {% if c.status %}{{ c.status }}{% elif c.active %}active{% else %}inactive{% endif %}
+                  </span>
                 </div>
                 <div style="display:flex;gap:6px;">
-                  <form method="post" action="{{ url_for('activate_campaign', campaign_id=c.id) }}" style="display:inline">
+                  <form class="campaign-action-form" method="post" action="{{ url_for('activate_campaign', campaign_id=c.id) }}" style="display:inline">
                     <button type="submit" class="btn">Activate</button>
                   </form>
-                  <form method="post" action="{{ url_for('update_campaign_status', campaign_id=c.id) }}" style="display:inline">
+                  <form class="campaign-action-form" method="post" action="{{ url_for('update_campaign_status', campaign_id=c.id) }}" style="display:inline">
                     <input type="hidden" name="status" value="pending">
                     <button type="submit" class="btn">Pending</button>
                   </form>
-                  <form method="post" action="{{ url_for('update_campaign_status', campaign_id=c.id) }}" style="display:inline">
+                  <form class="campaign-action-form" method="post" action="{{ url_for('update_campaign_status', campaign_id=c.id) }}" style="display:inline">
                     <input type="hidden" name="status" value="finished">
                     <button type="submit" class="btn">Finish</button>
                   </form>
-                  <form method="post" action="{{ url_for('update_campaign_status', campaign_id=c.id) }}" style="display:inline">
+                  <form class="campaign-action-form" method="post" action="{{ url_for('update_campaign_status', campaign_id=c.id) }}" style="display:inline">
                     <input type="hidden" name="status" value="canceled">
                     <button type="submit" class="btn">Cancel</button>
                   </form>
@@ -109,4 +179,55 @@
         </div>
       </section>
     </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.campaign-action-form').forEach(form => {
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const url = form.action;
+          const data = new FormData(form);
+          const postData = {};
+          data.forEach((value, key) => {
+            postData[key] = value;
+          });
+          try {
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+              },
+              body: JSON.stringify(postData)
+            });
+            if (!response.ok) throw new Error('Failed');
+            const result = await response.json();
+            form.querySelectorAll('button').forEach(btn => btn.disabled = true);
+            const info = document.createElement('div');
+            info.style.color = '#1e7d11';
+            info.style.marginTop = '6px';
+            info.textContent = 'Status updated successfully.';
+            form.parentNode.appendChild(info);
+
+            const item = form.closest('li');
+            if (item) {
+              const statusEl = item.querySelector('.campaign-status');
+              const newStatus = result.new_status || (result.action === 'activate' ? 'active' : null);
+              if (statusEl && newStatus) {
+                statusEl.textContent = newStatus;
+              }
+              if (result.action === 'activate') {
+                document.querySelectorAll('.campaign-status').forEach(el => {
+                  if (el !== statusEl) el.textContent = 'inactive';
+                });
+              }
+            }
+          } catch (error) {
+            console.error('Campaign action failed:', error);
+            alert('Action failed, please try again.');
+          }
+        });
+      });
+    });
+    </script>
 {% endblock %}

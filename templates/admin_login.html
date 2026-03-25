@@ -4,77 +4,99 @@
 
 {% block extra_css %}
 <style>
+        /* Hide header and footer for full-screen login */
+        header, footer {
+            display: none !important;
+        }
+
         body {
-            font-family: 'High Tower Text', sans-serif;
-            background: linear-gradient(to right, #2d2d7c, #00695c);
+            font-family: 'Times New Roman', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d2d7c 0%, #00695c 50%, #2d2d7c 100%);
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            background-attachment: fixed;
         }
 
         .login-container {
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: rgba(255, 255, 255, 0.95);
             padding: 40px;
             border-radius: 16px;
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             text-align: center;
             width: 100%;
             max-width: 400px;
-            font-family: 'High Tower Text', sans-serif;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         h2 {
-
             margin-bottom: 30px;
-            font-family: 'High Tower Text', sans-serif;
-            color: #ffffff;
+            color: #2d2d7c;
+            font-size: 28px;
+            font-weight: bold;
         }
 
         input[type="text"],
         input[type="password"] {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             margin-bottom: 20px;
-            border: none;
+            border: 2px solid #ddd;
             border-radius: 8px;
             background-color: #fff;
             color: #333;
             font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #2d2d7c;
+            box-shadow: 0 0 5px rgba(45, 45, 124, 0.3);
         }
 
         input[type="submit"] {
-            background-color: #00bfa5;
+            background: linear-gradient(135deg, #2d2d7c, #00695c);
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 15px 30px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            width: 100%;
         }
 
         input[type="submit"]:hover {
-            background-color: #1de9b6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .flash-message {
-            color: #ffbaba;
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 10px;
+            border-radius: 4px;
             margin-bottom: 20px;
-            font-style: italic;
+            border-left: 4px solid #d32f2f;
         }
 
         .back-home {
             display: inline-block;
             margin-top: 20px;
-            color: #b2dfdb;
+            color: #2d2d7c;
             text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
         }
 
         .back-home:hover {
+            color: #00695c;
             text-decoration: underline;
         }
     </style>
