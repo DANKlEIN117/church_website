@@ -28,7 +28,7 @@ MPESA_WEBHOOK_SECRET = os.getenv('MPESA_WEBHOOK_SECRET')  # webhook hmac secret
 
 MPESA_BASE_URL = 'https://sandbox.safaricom.co.ke' if MPESA_ENV == 'sandbox' else 'https://api.safaricom.co.ke'
 from db import init_app as db_init_app, init_db, add_payment, get_payments, get_summary, set_target_amount
-from db import create_campaign, get_campaigns, set_active_campaign, get_active_campaign, get_campaign, get_audits
+from db import create_campaign, get_campaigns, set_active_campaign, get_active_campaign, get_campaign, get_audits, set_campaign_status
 from db import update_payment_status, get_payment_by_checkout_request_id
 
 # Load environment variables
@@ -329,7 +329,107 @@ def admin_contributions():
         audits = get_audits(200)
     except Exception:
         audits = []
-    return render_template('admin_contributions.html', payments=payments, summary=summary, updated=updated, campaigns=campaigns, audits=audits)
+
+    total_transactions = len(payments)
+    unique_donors = len({p.get('from_name', '').strip() for p in payments if p.get('from_name')})
+    total_contributed = float(summary.get('total_contributed', 0) if isinstance(summary, dict) else summary.total_contributed)
+    average_amount = round(total_contributed / total_transactions, 2) if total_transactions > 0 else 0.0
+
+    # Build category chart data
+    category_totals = {}
+    for p in payments:
+        key = (p.get('category') or 'Uncategorized').strip() or 'Uncategorized'
+        try:
+            amount = float(p.get('amount', 0))
+        except Exception:
+            amount = 0.0
+        category_totals[key] = category_totals.get(key, 0.0) + amount
+
+    category_labels = list(category_totals.keys())
+    category_values = [round(v, 2) for v in category_totals.values()]
+
+    # Compute raised per campaign
+    campaign_raised = {}
+    for p in payments:
+        cid = p.get('campaign_id')
+        if cid:
+            campaign_raised[cid] = campaign_raised.get(cid, 0) + float(p.get('amount', 0) or 0)
+
+    return render_template(
+        'admin_contributions.html',
+        payments=payments,
+        summary=summary,
+        updated=updated,
+        campaigns=campaigns,
+        audits=audits,
+        total_transactions=total_transactions,
+        unique_donors=unique_donors,
+        average_amount=average_amount,
+        category_labels=category_labels,
+        category_values=category_values,
+        campaign_raised=campaign_raised,
+    )
+
+
+@app.route('/admin/contributions/data')
+def admin_contributions_data():
+    if not session.get('admin'):
+        return jsonify({'error': 'login required'}), 401
+
+    month = request.args.get('month')  # format YYYY-MM or empty
+    campaign_id = request.args.get('campaign_id')
+    method = request.args.get('method')
+
+    payments = get_payments(10000)
+
+    def match_payment(p):
+        if month:
+            ts = p.get('timestamp', '')
+            if not ts.startswith(month):
+                return False
+        if campaign_id and campaign_id != 'all':
+            if str(p.get('campaign_id', '')) != campaign_id:
+                return False
+        if method and method != 'all':
+            if str(p.get('method', '')).lower() != method.lower():
+                return False
+        return True
+
+    filtered = [p for p in payments if match_payment(p)]
+
+    total_contributed = sum(float(p.get('amount', 0) or 0) for p in filtered)
+    total_transactions = len(filtered)
+    unique_donors = len({(p.get('from_name') or '').strip() for p in filtered if p.get('from_name')})
+    average_amount = round(total_contributed / total_transactions, 2) if total_transactions else 0.0
+
+    category_totals = {}
+    for p in filtered:
+        category = (p.get('category') or 'Uncategorized')
+        category_totals[category] = category_totals.get(category, 0) + float(p.get('amount', 0) or 0)
+
+    category_labels = list(category_totals.keys())
+    category_values = [round(category_totals[k], 2) for k in category_labels]
+
+    # Get target amount: global if no campaign filter, else campaign-specific
+    if campaign_id and campaign_id != 'all':
+        campaign = get_campaign(campaign_id)
+        target_amount = float(campaign.get('target_amount', 0)) if campaign else 0.0
+    else:
+        global_summary = get_summary()
+        target_amount = float(global_summary.get('target_amount', 0) if isinstance(global_summary, dict) else global_summary.target_amount)
+
+    return jsonify({
+        'summary': {
+            'total_contributed': total_contributed,
+            'total_transactions': total_transactions,
+            'unique_donors': unique_donors,
+            'average_amount': average_amount,
+            'target_amount': target_amount,
+        },
+        'category_labels': category_labels,
+        'category_values': category_values,
+        'payments': filtered[:200],
+    })
 
 
 # Temporary admin-only debug route to fetch recent server log lines.

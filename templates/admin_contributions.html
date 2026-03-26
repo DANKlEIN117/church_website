@@ -68,21 +68,74 @@ input[type="text"], input[type="number"] {
 {% endblock %}
 
 {% block content %}
-<h2>Contributions (Admin)</h2>
+<h2>Contributions Dashboard (Admin)</h2>
     <main style="max-width:1100px;margin:18px auto;padding:8px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <strong>Target:</strong> Ksh {{ summary.target_amount | default(0) }}
-          </div>
-        <div>
-          <strong>Raised:</strong> Ksh {{ summary.total_contributed | default(0) }}
+      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;">
+        <div style="flex:1 1 220px;background:#fff;padding:16px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
+          <h3 style="margin:0;font-size:14px;color:#6c757d">Total Contributions</h3>
+          <p style="margin:8px 0 0;font-size:28px;color:#2d2d7c">Ksh {{ summary.total_contributed | default(0) }}</p>
         </div>
-        <div>
-          <a href="{{ url_for('export_contributions') }}" class="btn">Export CSV</a>
+        <div style="flex:1 1 220px;background:#fff;padding:16px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
+          <h3 style="margin:0;font-size:14px;color:#6c757d">Total Transactions</h3>
+          <p style="margin:8px 0 0;font-size:28px;color:#2d2d7c">{{ total_transactions }}</p>
+        </div>
+        <div style="flex:1 1 220px;background:#fff;padding:16px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
+          <h3 style="margin:0;font-size:14px;color:#6c757d">Unique Donors</h3>
+          <p style="margin:8px 0 0;font-size:28px;color:#2d2d7c">{{ unique_donors }}</p>
+        </div>
+        <div style="flex:1 1 220px;background:#fff;padding:16px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
+          <h3 style="margin:0;font-size:14px;color:#6c757d">Avg Contribution</h3>
+          <p style="margin:8px 0 0;font-size:28px;color:#2d2d7c">Ksh {{ average_amount }}</p>
+        </div>
+      </div>
+      <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;">
+        <div style="flex:1 1 100%;background:#fff;padding:14px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
+          <h3>Filter Contributions</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+            <label>Month
+              <input id="filter-month" type="month" style="padding:6px;" value="" />
+            </label>
+            <label>Campaign
+              <select id="filter-campaign" style="padding:6px;min-width:180px;">
+                <option value="all">All campaigns</option>
+                {% for c in campaigns %}
+                <option value="{{ c.id }}">{{ c.title }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label>Method
+              <select id="filter-method" style="padding:6px;min-width:160px;">
+                <option value="all">All methods</option>
+                <option value="mpesa-c2b">Mpesa C2B</option>
+                <option value="card">Card</option>
+                <option value="cash">Cash</option>
+              </select>
+            </label>
+            <button id="apply-filters" class="btn" style="height:34px;">Apply filters</button>
+          </div>
         </div>
       </div>
 
-        <div style="margin-top:12px;">
+      <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;">
+        <div style="flex:1 1 340px;background:#fff;padding:14px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
+          <h3>Fund Breakdown (by category)</h3>
+          <canvas id="categoryPieChart" style="max-height:260px;"></canvas>
+        </div>
+        <div style="flex:1 1 680px;background:#fff;padding:14px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
+          <h3>Summary</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div><strong>Target</strong><br>Ksh <span id="summary-target">{{ summary.target_amount | default(0) }}</span></div>
+            <div><strong>Raised</strong><br>Ksh <span id="summary-raised">{{ summary.total_contributed | default(0) }}</span></div>
+            <div><strong>Remaining</strong><br>Ksh <span id="summary-remaining">{{ (summary.target_amount | default(0)) - (summary.total_contributed | default(0)) }}</span></div>
+            <div><strong>Active Campaigns</strong><br>{{ campaigns|length }}</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:16px;display:flex;justify-content:flex-end;">
+        <a href="{{ url_for('export_contributions') }}" class="btn">Export CSV</a>
+      </div>
+
+      <div style="margin-top:12px;">
           {% if updated %}
             <div style="padding:8px;background:#e6ffed;border:1px solid #b7f0c6;border-radius:6px;margin-bottom:8px">Target updated successfully.</div>
           {% endif %}
@@ -103,7 +156,7 @@ input[type="text"], input[type="number"] {
             <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd">Method</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="payments-tbody">
           {% for p in payments %}
           <tr>
             <td style="padding:8px;border-bottom:1px solid #f1f1f1">{{ p.timestamp }}</td>
@@ -130,30 +183,22 @@ input[type="text"], input[type="number"] {
           <strong>Existing campaigns</strong>
           <ul style="list-style:none;padding-left:0;margin-top:8px">
             {% for c in campaigns %}
-              <li style="padding:8px;border:1px solid #eee;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
+              <li style="padding:8px;border:1px solid #eee;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;{% if c.status == 'active' %}background-color:#d4edda;border-color:#c3e6cb;{% elif c.status == 'pending' %}background-color:#fff3cd;border-color:#ffeaa7;{% elif c.status == 'finished' %}background-color:#cce5ff;border-color:#b3d7ff;{% elif c.status == 'canceled' %}background-color:#f8d7da;border-color:#f5c6cb;{% endif %}">
                 <div>
-                  <strong>{{ c.title }}</strong> — Ksh {{ c.target_amount }}
-                  <span class="campaign-status" style="font-style:italic;color:#00695c;margin-left:8px;">
-                    {% if c.status %}{{ c.status }}{% elif c.active %}active{% else %}inactive{% endif %}
+                  <strong>{{ c.title }}</strong> — Target: Ksh {{ c.target_amount }} | Raised: Ksh {{ campaign_raised.get(c.id, 0) }}
+                  <span class="campaign-status" style="font-style:italic;margin-left:8px;{% if c.status == 'active' %}color:#155724;{% elif c.status == 'pending' %}color:#856404;{% elif c.status == 'finished' %}color:#004085;{% elif c.status == 'canceled' %}color:#721c24;{% else %}color:#383d41;{% endif %}">
+                    {% if c.status %}{{ c.status|title }}{% elif c.active %}Active{% else %}Inactive{% endif %}
                   </span>
                 </div>
-                <div style="display:flex;gap:6px;">
-                  <form class="campaign-action-form" method="post" action="{{ url_for('activate_campaign', campaign_id=c.id) }}" style="display:inline">
-                    <button type="submit" class="btn">Activate</button>
-                  </form>
-                  <form class="campaign-action-form" method="post" action="{{ url_for('update_campaign_status', campaign_id=c.id) }}" style="display:inline">
-                    <input type="hidden" name="status" value="pending">
-                    <button type="submit" class="btn">Pending</button>
-                  </form>
-                  <form class="campaign-action-form" method="post" action="{{ url_for('update_campaign_status', campaign_id=c.id) }}" style="display:inline">
-                    <input type="hidden" name="status" value="finished">
-                    <button type="submit" class="btn">Finish</button>
-                  </form>
-                  <form class="campaign-action-form" method="post" action="{{ url_for('update_campaign_status', campaign_id=c.id) }}" style="display:inline">
-                    <input type="hidden" name="status" value="canceled">
-                    <button type="submit" class="btn">Cancel</button>
-                  </form>
-                </div>
+                <form class="campaign-status-form" method="post" action="{{ url_for('update_campaign_status', campaign_id=c.id) }}" style="display:flex;gap:4px;align-items:center;">
+                  <select name="status" style="padding:4px;border:1px solid #ddd;border-radius:4px;">
+                    <option value="active" {% if c.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="pending" {% if c.status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="finished" {% if c.status == 'finished' %}selected{% endif %}>Finished</option>
+                    <option value="canceled" {% if c.status == 'canceled' %}selected{% endif %}>Canceled</option>
+                  </select>
+                  <button type="submit" class="btn" style="padding:4px 8px;font-size:12px;">Update</button>
+                </form>
               </li>
             {% else %}
               <li>No campaigns yet.</li>
@@ -161,28 +206,105 @@ input[type="text"], input[type="number"] {
           </ul>
         </div>
       </section>
-      <section style="margin-top:18px;">
-        <h3>Recent Audits</h3>
-        <div style="margin-top:8px;">
-          {% if audits and audits|length > 0 %}
-            <ul style="list-style:none;padding-left:0;margin-top:8px">
-              {% for a in audits %}
-                <li style="padding:8px;border:1px solid #f4f4f4;margin-bottom:6px">
-                  <div style="font-size:0.95em;color:#333">{{ a.timestamp }} — <strong>{{ a.action }}</strong> by {{ a.actor or 'system' }}</div>
-                  <div style="font-size:0.9em;color:#666">Campaign: {{ a.campaign_id }} | {{ a.old_status }} → {{ a.new_status }}</div>
-                </li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <div style="padding:8px;color:#666">No audit records yet.</div>
-          {% endif %}
-        </div>
-      </section>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.campaign-action-form').forEach(form => {
+      let categoryChart = null;
+
+      const ctx = document.getElementById('categoryPieChart');
+      const chartColors = ['#2d2d7c', '#00695c', '#d4af37', '#9c27b0', '#ff7043', '#29b6f6', '#66bb6a'];
+
+      function renderChart(labels, values) {
+        if (!ctx) return;
+
+        if (categoryChart) {
+          categoryChart.data.labels = labels;
+          categoryChart.data.datasets[0].data = values;
+          categoryChart.update();
+          return;
+        }
+
+        categoryChart = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: values,
+              backgroundColor: labels.map((_, idx) => chartColors[idx % chartColors.length]),
+              borderColor: '#fff',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            plugins: {
+              legend: { position: 'bottom' },
+              tooltip: { enabled: true }
+            }
+          }
+        });
+      }
+
+      async function fetchAndUpdateDashboard() {
+        const month = document.getElementById('filter-month').value || '';
+        const campaign_id = document.getElementById('filter-campaign').value || 'all';
+        const method = document.getElementById('filter-method').value || 'all';
+        const url = `/admin/contributions/data?month=${encodeURIComponent(month)}&campaign_id=${encodeURIComponent(campaign_id)}&method=${encodeURIComponent(method)}`;
+
+        try {
+          const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+          if (!response.ok) {
+            console.error('Failed to load contributions data', response.status);
+            return;
+          }
+          const payload = await response.json();
+          if (payload.error) {
+            console.error('Error in response:', payload.error);
+            return;
+          }
+
+          // update summary cards
+          document.getElementById('summary-raised').textContent = payload.summary.total_contributed.toFixed(2);
+          document.getElementById('summary-target').textContent = payload.summary.target_amount.toFixed(2);
+          document.getElementById('summary-remaining').textContent = (payload.summary.target_amount - payload.summary.total_contributed).toFixed(2);
+
+          // update chart
+          renderChart(payload.category_labels, payload.category_values);
+
+          // update table rows
+          const tbody = document.getElementById('payments-tbody');
+          if (tbody) {
+            tbody.innerHTML = '';
+            if (payload.payments.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="5" style="padding:12px">No contributions found for filters.</td></tr>';
+            } else {
+              payload.payments.forEach((p) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                  <td style="padding:8px;border-bottom:1px solid #f1f1f1">${p.timestamp || '-'}<\/td>
+                  <td style="padding:8px;border-bottom:1px solid #f1f1f1">${p.from_name || '-'}<\/td>
+                  <td style="padding:8px;border-bottom:1px solid #f1f1f1;text-align:right">${parseFloat(p.amount || 0).toFixed(2)}<\/td>
+                  <td style="padding:8px;border-bottom:1px solid #f1f1f1">${(p.category || 'Uncategorized') .toString().trim() }<\/td>
+                  <td style="padding:8px;border-bottom:1px solid #f1f1f1">${p.method || '-'}<\/td>
+                `;
+                tbody.appendChild(row);
+              });
+            }
+          }
+
+        } catch (error) {
+          console.error('Error updating dashboard:', error);
+        }
+      }
+
+      document.getElementById('apply-filters').addEventListener('click', (e) => {
+        e.preventDefault();
+        fetchAndUpdateDashboard();
+      });
+
+      // campaign status update forms
+      document.querySelectorAll('.campaign-status-form').forEach(form => {
         form.addEventListener('submit', async (event) => {
           event.preventDefault();
           const url = form.action;
@@ -202,32 +324,33 @@ input[type="text"], input[type="number"] {
             });
             if (!response.ok) throw new Error('Failed');
             const result = await response.json();
-            form.querySelectorAll('button').forEach(btn => btn.disabled = true);
-            const info = document.createElement('div');
-            info.style.color = '#1e7d11';
-            info.style.marginTop = '6px';
-            info.textContent = 'Status updated successfully.';
-            form.parentNode.appendChild(info);
-
+            form.querySelector('button').disabled = true;
+            form.querySelector('button').textContent = 'Updated';
             const item = form.closest('li');
             if (item) {
               const statusEl = item.querySelector('.campaign-status');
-              const newStatus = result.new_status || (result.action === 'activate' ? 'active' : null);
+              const newStatus = result.new_status || postData.status;
               if (statusEl && newStatus) {
-                statusEl.textContent = newStatus;
-              }
-              if (result.action === 'activate') {
-                document.querySelectorAll('.campaign-status').forEach(el => {
-                  if (el !== statusEl) el.textContent = 'inactive';
-                });
+                statusEl.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                // Update text color
+                statusEl.style.color = newStatus === 'active' ? '#155724' : newStatus === 'pending' ? '#856404' : newStatus === 'finished' ? '#004085' : newStatus === 'canceled' ? '#721c24' : '#383d41';
+                // Update li background and border
+                item.style.backgroundColor = newStatus === 'active' ? '#d4edda' : newStatus === 'pending' ? '#fff3cd' : newStatus === 'finished' ? '#cce5ff' : newStatus === 'canceled' ? '#f8d7da' : '';
+                item.style.borderColor = newStatus === 'active' ? '#c3e6cb' : newStatus === 'pending' ? '#ffeaa7' : newStatus === 'finished' ? '#b3d7ff' : newStatus === 'canceled' ? '#f5c6cb' : '#eee';
               }
             }
+            setTimeout(() => {
+              form.querySelector('button').disabled = false;
+              form.querySelector('button').textContent = 'Update';
+            }, 2000);
           } catch (error) {
-            console.error('Campaign action failed:', error);
-            alert('Action failed, please try again.');
+            console.error('Campaign status update failed:', error);
+            alert('Update failed, please try again.');
           }
         });
       });
+
+      fetchAndUpdateDashboard();
     });
     </script>
 {% endblock %}

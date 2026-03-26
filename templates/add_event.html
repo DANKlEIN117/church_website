@@ -8,11 +8,16 @@
             font-family: 'High Tower Text', serif;
             background: linear-gradient(to right, #2d2d7c, #00695c);
             color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-wrapper {
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            align-items: flex-start;
+            min-height: calc(100vh - 220px);
+            padding: 60px 0;
         }
 
         .event-container {
@@ -74,7 +79,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="event-container">
+<div class="page-wrapper">
+    <div class="event-container">
         <h2>➕ Add Church Event</h2>
 
         <form method="POST">
@@ -86,4 +92,5 @@
 
         <a href="{{ url_for('events.events') }}">🔙 Back to Events</a>
     </div>
+</div>
 {% endblock %}

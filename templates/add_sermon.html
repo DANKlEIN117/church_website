@@ -10,11 +10,14 @@
             color: white;
             margin: 0;
             padding: 0;
+        }
+
+        .page-wrapper {
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-height: 100vh;
-            padding-top: 60px;
+            min-height: calc(100vh - 220px);
+            padding: 60px 0;
         }
 
         .container {
@@ -88,7 +91,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="page-wrapper">
+    <div class="container">
         <h2>➕ Add Church Sermon</h2>
 
         <form method="POST">
@@ -103,4 +107,5 @@
             <a href="{{ url_for('sermons.sermons') }}">🔙 Back to Sermons</a>
         </div>
     </div>
+</div>
 {% endblock %}
