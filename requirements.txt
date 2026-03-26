@@ -3,3 +3,4 @@ cloudinary
 python-dotenv
 werkzeug
 gunicorn
+Flask-Mail
