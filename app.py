@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, current_app, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, current_app, session, redirect, url_for,flash
 from collections import deque
 from routes import register_blueprints
 import os
@@ -14,6 +14,7 @@ import base64
 import logging
 import io
 import csv
+from flask_mail import Mail, Message
 import urllib.request
 import urllib.parse
 
@@ -569,6 +570,51 @@ def admin_set_target():
 
     return '', 302, {'Location': (request.referrer or '/admin/contributions') + '?ok=1'}
 
+# 🔥 EMAIL CONFIG
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'omondiokothdan@gmail.com'
+app.config['MAIL_PASSWORD'] = 'pukq qnqk yeag dkbr'
+
+mail = Mail(app)
+# 🔥 FEEDBACK ROUTE
+@app.route('/feedback', methods=['POST'])
+def feedback():
+    name = request.form.get('name')
+    email = request.form.get('email')
+    message = request.form.get('message')
+
+    print(f"{name} | {email} | {message}")
+
+    try:
+        msg = Message(
+            subject="We received your message 🙏",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[email]
+        )
+
+        msg.body = f"""
+Hello {name},
+
+Thank you for contacting Rapogi Lwanda SDA Church.
+
+We received your message:
+"{message}"
+
+We will respond shortly.
+
+Blessings 🙏
+        """
+
+        mail.send(msg)
+        flash("Feedback sent successfully!", "success")
+
+    except Exception as e:
+        print("Email failed:", e)
+        flash("Message received, but email reply failed.", "warning")
+
+    return redirect(url_for('home'))
 
 # Error handlers (optional but pro)
 @app.errorhandler(404)
