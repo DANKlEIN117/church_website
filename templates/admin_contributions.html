@@ -5,7 +5,7 @@
 {% block extra_css %}
 <style>
 body {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+    background: linear-gradient(135deg, #5f91dd 0%, #c3cfe2 100%) !important;
     color: #333 !important;
     min-height: 100vh;
 }
@@ -81,6 +81,60 @@ input[type="text"], input[type="number"] {
     border-radius: 4px;
     margin-bottom: 8px;
     border: 1px solid #b7f0c6;
+}
+@media (max-width: 768px) {
+  main {
+    padding: 12px;
+  }
+  h2 {
+    font-size: 1.2rem !important; /* smaller font on phones */
+    padding: 12px 14px !important; /* reduce padding */
+    word-wrap: break-word; /* allow text to wrap */
+    text-align: center; /* center it */
+    width: 90%;
+    margin: 20px 0px 30px 0px;
+  }
+
+  .metric-card-1, .metric-card-2, .metric-card-3, .metric-card-4 {
+    flex: 1 1 100%;
+    font-size: 14px;
+  }
+
+  #create-campaign, form[method="post"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  #create-campaign input,
+  form[method="post"] input,
+  form[method="post"] select,
+  #filter-month,
+  #filter-campaign,
+  #filter-method {
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .btn {
+    width: auto !important; /* no full width */
+    text-align: center;
+    padding: 8px 16px;
+  }
+
+  #apply-filters {
+    margin-top: 6px;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  table th, table td {
+    white-space: nowrap;
+  }
 }
 </style>
 {% endblock %}
