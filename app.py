@@ -579,7 +579,7 @@ app.config['MAIL_PASSWORD'] = 'pukq qnqk yeag dkbr'
 
 mail = Mail(app)
 # 🔥 FEEDBACK ROUTE
-@app.route('/feedback', methods=['POST'])
+@app.route('/feedback', methods=['GET', 'POST'])
 def feedback():
     name = request.form.get('name')
     email = request.form.get('email')
