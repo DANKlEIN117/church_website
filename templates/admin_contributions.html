@@ -5,18 +5,28 @@
 {% block extra_css %}
 <style>
 body {
-    background-color: #f5f5f5 !important;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
     color: #333 !important;
+    min-height: 100vh;
 }
 main {
     background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     padding: 20px;
 }
-h2, h3 {
+h2 {
+    color: #fff;
+    background: linear-gradient(135deg, #2d2d7c 0%, #00695c 100%);
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: -20px -20px 20px -20px;
+    border-bottom: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+h3 {
     color: #2d2d7c;
-    border-bottom: 2px solid #2d2d7c;
+    border-bottom: 3px solid #00695c;
     padding-bottom: 8px;
 }
 table {
@@ -26,14 +36,14 @@ table {
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 th {
-    background-color: #2d2d7c;
+    background: linear-gradient(135deg, #2d2d7c 0%, #1a1a4d 100%);
     color: white;
 }
 td {
     color: #333;
 }
 .btn {
-    background-color: #2d2d7c;
+    background: linear-gradient(135deg, #2d2d7c 0%, #1a1a4d 100%);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -41,16 +51,24 @@ td {
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
+    transition: all 0.3s ease;
 }
 .btn:hover {
-    background-color: #00695c;
+    background: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 form {
-    background-color: #f9f9f9;
+    background: linear-gradient(135deg, #f0f4ff 0%, #f0fff4 100%);
     padding: 12px;
     border-radius: 6px;
     margin-bottom: 12px;
+    border-left: 4px solid #2d2d7c;
 }
+.metric-card-1 { border-left: 4px solid #ff6b6b; }
+.metric-card-2 { border-left: 4px solid #4ecdc4; }
+.metric-card-3 { border-left: 4px solid #45b7d1; }
+.metric-card-4 { border-left: 4px solid #ffa502; }
 input[type="text"], input[type="number"] {
     border: 1px solid #ddd;
     padding: 6px;
@@ -70,27 +88,27 @@ input[type="text"], input[type="number"] {
 {% block content %}
 <h2>Contributions Dashboard (Admin)</h2>
     <main style="max-width:1100px;margin:18px auto;padding:8px;">
-      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;">
-        <div style="flex:1 1 220px;background:#fff;padding:16px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
-          <h3 style="margin:0;font-size:14px;color:#6c757d">Total Contributions</h3>
-          <p style="margin:8px 0 0;font-size:28px;color:#2d2d7c">Ksh {{ summary.total_contributed | default(0) }}</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;">
+        <div class="metric-card-1" style="flex:1 1 220px;background:linear-gradient(135deg,#fff5f5 0%,#ffe0e0 100%);padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(255,107,107,0.1);">
+          <h3 style="margin:0;font-size:14px;color:#c92a2a">💰 Total Contributions</h3>
+          <p style="margin:8px 0 0;font-size:28px;color:#c92a2a;font-weight:bold;">Ksh {{ summary.total_contributed | default(0) }}</p>
         </div>
-        <div style="flex:1 1 220px;background:#fff;padding:16px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
-          <h3 style="margin:0;font-size:14px;color:#6c757d">Total Transactions</h3>
-          <p style="margin:8px 0 0;font-size:28px;color:#2d2d7c">{{ total_transactions }}</p>
+        <div class="metric-card-2" style="flex:1 1 220px;background:linear-gradient(135deg,#f0f9ff 0%,#e0f7f4 100%);padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(78,205,196,0.1);">
+          <h3 style="margin:0;font-size:14px;color:#0b8a6d">📊 Total Transactions</h3>
+          <p style="margin:8px 0 0;font-size:28px;color:#0b8a6d;font-weight:bold;">{{ total_transactions }}</p>
         </div>
-        <div style="flex:1 1 220px;background:#fff;padding:16px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
-          <h3 style="margin:0;font-size:14px;color:#6c757d">Unique Donors</h3>
-          <p style="margin:8px 0 0;font-size:28px;color:#2d2d7c">{{ unique_donors }}</p>
+        <div class="metric-card-3" style="flex:1 1 220px;background:linear-gradient(135deg,#f0f8ff 0%,#e0f4ff 100%);padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(69,183,209,0.1);">
+          <h3 style="margin:0;font-size:14px;color:#0077be">👥 Unique Donors</h3>
+          <p style="margin:8px 0 0;font-size:28px;color:#0077be;font-weight:bold;">{{ unique_donors }}</p>
         </div>
-        <div style="flex:1 1 220px;background:#fff;padding:16px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
-          <h3 style="margin:0;font-size:14px;color:#6c757d">Avg Contribution</h3>
-          <p style="margin:8px 0 0;font-size:28px;color:#2d2d7c">Ksh {{ average_amount }}</p>
+        <div class="metric-card-4" style="flex:1 1 220px;background:linear-gradient(135deg,#fff8e0 0%,#ffe8b6 100%);padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(255,165,2,0.1);">
+          <h3 style="margin:0;font-size:14px;color:#d97706">📈 Avg Contribution</h3>
+          <p style="margin:8px 0 0;font-size:28px;color:#d97706;font-weight:bold;">Ksh {{ average_amount }}</p>
         </div>
       </div>
       <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;">
-        <div style="flex:1 1 100%;background:#fff;padding:14px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
-          <h3>Filter Contributions</h3>
+        <div style="flex:1 1 100%;background:linear-gradient(135deg,#f0f4ff 0%,#e8f4f8 100%);padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:4px solid #2d2d7c;">
+          <h3 style="color:#2d2d7c;margin-top:0;">🔍 Filter Contributions</h3>
           <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
             <label>Month
               <input id="filter-month" type="month" style="padding:6px;" value="" />
@@ -117,12 +135,12 @@ input[type="text"], input[type="number"] {
       </div>
 
       <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;">
-        <div style="flex:1 1 340px;background:#fff;padding:14px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
-          <h3>Fund Breakdown (by category)</h3>
+        <div style="flex:1 1 340px;background:linear-gradient(135deg,#fff8f0 0%,#f0f8ff 100%);padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);border-top:4px solid #ff6b6b;">
+          <h3 style="background:linear-gradient(135deg,#ff6b6b,#ffa502);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-top:0;">📊 Fund Breakdown (by category)</h3>
           <canvas id="categoryPieChart" style="max-height:260px;"></canvas>
         </div>
-        <div style="flex:1 1 680px;background:#fff;padding:14px;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.08);">
-          <h3>Summary</h3>
+        <div style="flex:1 1 680px;background:linear-gradient(135deg,#f0fff4 0%,#f0f8ff 100%);padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);border-top:4px solid #00695c;">
+          <h3 style="background:linear-gradient(135deg,#00695c,#2d2d7c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-top:0;">📋 Summary</h3>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
             <div><strong>Target</strong><br>Ksh <span id="summary-target">{{ summary.target_amount | default(0) }}</span></div>
             <div><strong>Raised</strong><br>Ksh <span id="summary-raised">{{ summary.total_contributed | default(0) }}</span></div>
@@ -146,7 +164,9 @@ input[type="text"], input[type="number"] {
           </form>
         </div>
 
-      <table style="width:100%;border-collapse:collapse;margin-top:12px;">
+      <div style="margin-top:16px;background:linear-gradient(135deg,#fff5f0 0%,#f8f0ff 100%);padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);border-left:4px solid #ff6b6b;">
+        <h3 style="color:#c92a2a;margin-top:0;">📜 Recent Contributions</h3>
+      <table style="width:100%;border-collapse:collapse;">
         <thead>
           <tr>
             <th style="text-align:left;padding:8px;border-bottom:1px solid #ddd">When</th>
@@ -170,9 +190,10 @@ input[type="text"], input[type="number"] {
           {% endfor %}
         </tbody>
       </table>
+      </div>
       
-      <section style="margin-top:18px;">
-        <h3>Manage Campaigns</h3>
+      <section style="margin-top:18px;background:linear-gradient(135deg,#fbf0ff 0%,#f0f8ff 100%);padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);border-left:4px solid #9c27b0;">
+        <h3 style="background:linear-gradient(135deg,#9c27b0,#673ab7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-top:0;">🎯 Manage Campaigns</h3>
         <form id="create-campaign" method="post" action="{{ url_for('create_campaign_route') }}" style="display:flex;gap:8px;align-items:center;">
           <input name="title" placeholder="Campaign title" required style="padding:6px">
           <input name="target_amount" placeholder="Target (Ksh)" required type="number" step="0.01" style="padding:6px">

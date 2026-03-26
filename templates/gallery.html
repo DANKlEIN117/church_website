@@ -4,120 +4,217 @@
 
 {% block extra_css %}
 <style>
-        body {
-            font-family: 'High Tower Text', sans-serif;
-            background: #9b7a85;
-            text-align: center;
-        }
+    /* ===== Global ===== */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
+    body {
+        font-family: 'High Tower Text', sans-serif;
+        background: #0d3f9192;
+        color: #fff;
+    }
+
+    h2 {
+        text-align: center;
+        color: #573ec5;
+        margin: 30px 0;
+        font-size: 1.8rem;
+    }
+
+    /* ===== Gallery Grid ===== */
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .gallery-item {
+        position: relative;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .gallery-item img:hover {
+        transform: scale(1.05);
+    }
+
+    .caption {
+        margin-top: 8px;
+        font-size: 14px;
+        font-style: italic;
+        text-align: center;
+    }
+
+    .delete-btn {
+        margin-top: 10px;
+        background-color: #ff5252;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        width: 100%;
+    }
+
+    .delete-btn:hover {
+        background-color: #ff1744;
+    }
+
+    /* ===== Lightbox ===== */
+    .lightbox {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .lightbox:target {
+        display: flex;
+    }
+
+    .lightbox img {
+        max-width: 90%;
+        max-height: 90%;
+        border: 5px solid white;
+        border-radius: 10px;
+    }
+
+    .lightbox .close {
+        position: absolute;
+        top: 20px;
+        right: 40px;
+        font-size: 40px;
+        color: white;
+        text-decoration: none;
+    }
+
+    /* ===== Buttons ===== */
+    .gallery-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin: 30px 0;
+    }
+
+    .btn {
+        background-color: #006d77;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        display: inline-block;
+        transition: 0.3s;
+    }
+
+    .btn:hover {
+        background-color: #00bfa5;
+    }
+
+    /* ===== Responsive: Tablets & Phones ===== */
+    @media (max-width: 768px) {
         h2 {
-            color: #573ec5;
-            margin-bottom: 30px;
+            font-size: 1.4rem;
+            margin: 20px 0;
         }
 
         .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
-            padding: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            padding: 12px;
         }
 
         .gallery-item {
-            position: relative;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 10px;
-            border-radius: 10px;
+            padding: 6px;
         }
 
         .gallery-item img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .gallery-item img:hover {
-            transform: scale(1.05);
+            height: 140px;
         }
 
         .caption {
-            color: #fff;
-            margin-top: 8px;
-            font-size: 14px;
-            font-style: italic;
+            font-size: 12px;
         }
 
         .delete-btn {
-            margin-top: 10px;
-            background-color: #ff5252;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .delete-btn:hover {
-            background-color: #ff1744;
-        }
-
-        /* Lightbox */
-        .lightbox {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .lightbox:target {
-            display: flex;
-        }
-
-        .lightbox img {
-            max-width: 90%;
-            max-height: 90%;
-            border: 5px solid white;
-            border-radius: 10px;
-        }
-
-        .lightbox .close {
-            position: absolute;
-            top: 20px;
-            right: 40px;
-            font-size: 40px;
-            color: white;
-            text-decoration: none;
+            font-size: 12px;
+            padding: 5px;
         }
 
         .gallery-actions {
-            margin-top: 30px;
+            flex-direction: column;
+            gap: 10px;
         }
 
+        .lightbox img {
+            max-width: 95%;
+            max-height: 80%;
+        }
+
+        .lightbox .close {
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .gallery-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .gallery-item img {
+            height: 140px;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+        }
+
+        .lightbox .close {
+            font-size: 24px;
+            top: 8px;
+            right: 12px;
+        }
+    }
+    @media (max-width: 768px) {
         .btn {
-            background-color: #006d77;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            margin: 5px;
-            display: inline-block;
+            width: auto;       /* 🔥 change from 100% to auto */
+            padding: 10px 20px; /* keep some padding */
+            font-size: 14px;
         }
 
-        .btn:hover {
-            background-color: #00bfa5;
+        .gallery-actions {
+            flex-direction: row;  /* buttons stay side by side */
+            flex-wrap: wrap;      /* wrap to next line if needed */
+            gap: 10px;
+            justify-content: center; /* center them */
         }
-    </style>
+}
+</style>
 {% endblock %}
-
 {% block content %}
 <h2>📸 Rapogi Lwanda Church Gallery</h2>
 
@@ -146,13 +243,11 @@
     </div>
 
     <div class="gallery-actions">
-        <a href="{{ url_for('gallery.upload_photo') }}" class="btn">📤 Upload Photo</a>
+        {% if session.get('admin') %}
+            <a href="{{ url_for('gallery.upload_photo') }}" class="btn">📤 Upload Photo</a>
+        {% endif %}
         <a href="{{ url_for('home') }}" class="btn">🏠 Back to Home</a>
     </div>
 
-    {% if session.get('admin') %}
-        <p>You are logged in as admin</p>
-    {% else %}
-        <a href="{{ url_for('admin.admin_login') }}">🔐 Admin Login</a>
-    {% endif %}
+    
 {% endblock %}

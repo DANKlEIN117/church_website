@@ -77,8 +77,8 @@
         .day-cell.selected{outline:3px solid rgba(247, 18, 18, 0.945)}
 
         /* past vs upcoming visuals */
-        .day-cell.past{background:#9f4fb88f;color:#797bd1bb}
-        .day-cell.upcoming{background:linear-gradient(180deg,#6ceea2a8,#94ee579d)}
+        .day-cell.past{background:#179c9ca2;color:#797bd1bb}
+        .day-cell.upcoming{background:linear-gradient(180deg,#2f0794aa,#94ee579d)}
         .dot{transition:transform .12s ease}
 
         .event-list{margin-top:12px;padding:12px;border-radius:10px;background:#fbfdff;border:1px solid rgba(2,6,23,0.04)}
@@ -146,6 +146,90 @@
             .calendar-actions{width:100%;justify-content:flex-start}
             .pdf-frame{height:60vh}
         }
+        /* =========================
+   MOBILE RESPONSIVENESS FIX
+========================= */
+@media (max-width: 768px){
+
+    /* Container spacing */
+    .calendar-wrap{
+        padding: 12px;
+        margin: 10px;
+    }
+
+    /* Header layout */
+    .calendar-header{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .calendar-title h2{
+        font-size: 1.2rem;
+    }
+
+    .calendar-title p{
+        font-size: 0.8rem;
+    }
+
+    /* Buttons stack nicely */
+    .calendar-actions{
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .calendar-actions .btn{
+        flex: 1 1 auto;
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+
+    #monthLabel{
+        width: 100%;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    /* 🔥 BIG FIX: calendar grid */
+    .weekdays{
+        font-size: 0.7rem;
+        gap: 2px;
+    }
+
+    .days{
+        gap: 4px;
+    }
+
+    .day-cell{
+        min-height: 60px; /* reduce size */
+        padding: 4px;
+    }
+
+    .day-cell .num{
+        font-size: 0.75rem;
+    }
+
+    .dot{
+        width: 6px;
+        height: 6px;
+    }
+
+    /* Events section */
+    .event-list{
+        padding: 8px;
+        font-size: 0.85rem;
+    }
+
+    .ev-title{
+        font-size: 0.9rem;
+    }
+
+    .ev-desc{
+        font-size: 0.8rem;
+    }
+
+}
     </style>
 {% endblock %}
 

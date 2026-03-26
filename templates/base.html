@@ -56,6 +56,9 @@
                         <li><a href="#">Who We Are</a></li>
                         <li><a href="#">Our Mission</a></li>
                         <li><a href="#">Pastor's Message</a></li>
+                        {% if session.get('admin') %}
+                            <li><a href="{{ url_for('admin_contributions') }}">Admin Page</a></li>
+                        {% endif %}
                     </ul>
                 </li>
 
@@ -135,12 +138,12 @@
         </nav>
     </header>
 
-    <main style="padding: 40px 20px;">
+    
         {% block content %}{% endblock %}
-    </main>
+   
 
     <footer class="db">
-        <p>&copy; 2025 Rapogi Lwanda SDA Church | All Rights Reserved</p>
+        <p>&copy; 2026 Rapogi Lwanda SDA Church | All Rights Reserved</p>
         {% if session.get('admin') %}
         <p>You are logged in as admin</p>
         {% else %}

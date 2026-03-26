@@ -4,26 +4,41 @@
 
 {% block content %}
     <section class="hero">
-        <h2>"Let your light shine before others." – Matthew 5:16</h2>
-        <p>Welcome to a place of peace, worship, and community.</p>
-        <p style="margin-top:16px;">
-            {% if session.get('admin') %}
-                <a href="{{ url_for('admin_contributions') }}" class="btn">🙏 Contribute (Admin)</a>
-            {% endif %}
-        </p>
-    </section>
+        <div class="slider">
+            <div class="slide" style="background-image: url('/static/images/image.png');"></div>
+            <div class="slide active" style="background-image: url('/static/images/image1.png');"></div>
+            <div class="slide" style="background-image: url('/static/images/image2.png');"></div>
+            <div class="slide" style="background-image: url('/static/images/image3.png');"></div>
+        </div>
 
-    <section class="mission">
-        <h3>OUR MISSION</h3>
-        <p>To reach the unreached and uplift souls through the word of God.</p>
+        <div class="hero-content">
+            <h2>"Let your light shine before others." – Matthew 5:16</h2>
+            <p>Welcome to a place of peace, worship, and community.</p>
+        </div>
     </section>
-
+    <section class="mission"> 
+        <h3>OUR MISSION</h3> 
+        <p>To reach the unreached and uplift souls through the word of God.</p> 
+    </section>
     <script>
-        function button(){
-            button.onclick()
+        const slides = document.querySelectorAll(".slide");
+        let current = 0;
+
+        function showNextSlide() {
+            slides[current].classList.remove("active");
+
+            current = (current + 1) % slides.length;
+
+            slides[current].classList.add("active");
         }
 
-        // Notifications dropdown behavior
+        setInterval(showNextSlide, 4000); // every 4 seconds
+    </script>
+
+    
+
+    <script>
+        // Notifications dropdown behavior (UNCHANGED)
         (function(){
             const bell = document.getElementById('bellBtn');
             const dropdown = document.getElementById('bellDropdown');
@@ -43,7 +58,6 @@
                 const upcoming = [];
                 const past = [];
                 (data || []).forEach(ev=>{
-                    // expect ev.date YYYY-MM-DD
                     const parts = ev.date.split('-');
                     if (parts.length !== 3) return;
                     const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
@@ -77,7 +91,6 @@
                 }
                 pastEl.appendChild(pastList);
 
-                // update badge
                 const badge = document.querySelector('.bell-badge');
                 if (badge){
                     if (upcoming.length) badge.textContent = String(upcoming.length); else badge.remove();
@@ -89,38 +102,41 @@
                 const pastEl = document.getElementById('notify-past');
                 if (upEl) upEl.innerHTML = '<div class="notify-loading">Loading…</div>';
                 if (pastEl) pastEl.innerHTML = '<div class="notify-loading">Loading…</div>';
-                return fetch('/events/data').then(r=>r.json()).then(data=>{ renderNotifications(data); loaded = true; }).catch(err=>{
-                    const up = document.getElementById('notify-upcoming'); if (up) up.innerHTML = '<div class="notify-item">Unable to load</div>';
-                    const pa = document.getElementById('notify-past'); if (pa) pa.innerHTML = '<div class="notify-item">Unable to load</div>';
-                });
+                return fetch('/events/data')
+                    .then(r=>r.json())
+                    .then(data=>{ renderNotifications(data); loaded = true; })
+                    .catch(()=>{
+                        if (upEl) upEl.innerHTML = '<div class="notify-item">Unable to load</div>';
+                        if (pastEl) pastEl.innerHTML = '<div class="notify-item">Unable to load</div>';
+                    });
             }
 
             function openDropdown(){
                 dropdown.hidden = false;
                 dropdown.setAttribute('aria-hidden','false');
                 bell.setAttribute('aria-expanded','true');
-                // fetch data when opening for the first time
                 if (!loaded) fetchNotifications();
             }
+
             function closeDropdown(){
                 dropdown.hidden = true;
                 dropdown.setAttribute('aria-hidden','true');
                 bell.setAttribute('aria-expanded','false');
             }
 
-            bell.addEventListener('click', (e)=>{
+            bell.addEventListener('click', ()=>{
                 if (dropdown.hidden) openDropdown(); else closeDropdown();
             });
 
-            // close when clicking outside
             document.addEventListener('click', (e)=>{
                 if (!dropdown.hidden && !dropdown.contains(e.target) && e.target !== bell){
                     closeDropdown();
                 }
             });
 
-            // close on escape
-            document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeDropdown(); });
+            document.addEventListener('keydown', (e)=>{
+                if (e.key === 'Escape') closeDropdown();
+            });
         })();
     </script>
 {% endblock %}
